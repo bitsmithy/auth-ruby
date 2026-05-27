@@ -49,6 +49,11 @@ module Bitsmithy
       # Test Methods
 
       def test_mode!
+        unless defined?(Rails) && (Rails.env.test? || Rails.env.development?)
+          raise ConfigurationError,
+                "#{self}.#{__method__} is only available in Rails test or development environments."
+        end
+
         config.otp_adapter = OTP::TestAdapter.new(config)
       end
 
