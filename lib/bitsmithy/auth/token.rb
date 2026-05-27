@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require "jwt"
+require_relative "config"
+require_relative "identity"
+require_relative "errors"
 
 module Bitsmithy
   module Auth
