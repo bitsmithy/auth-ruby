@@ -14,13 +14,14 @@ module Bitsmithy
       def self.decode(token, config:)
         payload, _header = JWT.decode(token, config.signing_key, true,
                                       algorithm: Config::JWT_ALGORITHM,
-                                      iss: Config::JWT_ISSUER,
-                                      verify_iss: true)
+                                      iss: Config::JWT_ISSUER, verify_iss: true)
         Identity.new(
           phone: payload["sub"],
           issued_at: Time.at(payload["iat"]),
           expires_at: Time.at(payload["exp"])
         )
+      rescue JWT::DecodeError => e
+        raise InvalidToken, e.message
       end
     end
   end
