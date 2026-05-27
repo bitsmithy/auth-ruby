@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD — bitsmithy-auth v0.1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'Fragment Mono', 'SF Mono', Consolas, monospace;
+
+  --bg: #eef2f8;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-recessed: #e3eaf3;
+  --grid: rgba(30, 58, 95, 0.06);
+
+  --border: rgba(30, 58, 95, 0.14);
+  --border-bright: rgba(30, 58, 95, 0.28);
+
+  --text: #0f1d2e;
+  --text-dim: #4a5c75;
+  --text-bright: #050b15;
+
+  --ink: #1e3a5f;             /* primary deep blue */
+  --ink-dim: rgba(30, 58, 95, 0.10);
+  --ink-bright: #2a5183;
+
+  --accent: #b58218;          /* warm gold accent */
+  --accent-dim: rgba(181, 130, 24, 0.12);
+
+  --rose: #a8324a;
+  --rose-dim: rgba(168, 50, 74, 0.10);
+
+  --sage: #4d7c0f;
+  --sage-dim: rgba(77, 124, 15, 0.10);
+
+  --red: var(--rose);
+  --red-dim: var(--rose-dim);
+  --green: var(--sage);
+  --green-dim: var(--sage-dim);
+  --orange: var(--accent);
+  --orange-dim: var(--accent-dim);
+
+  --node-a: var(--ink);
+  --node-a-dim: var(--ink-dim);
+  --node-b: var(--accent);
+  --node-b-dim: var(--accent-dim);
+  --node-c: var(--sage);
+  --node-c-dim: var(--sage-dim);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #050b15;
+    --surface: #0f1828;
+    --surface-elevated: #16223a;
+    --surface-recessed: #08111e;
+    --grid: rgba(143, 184, 233, 0.05);
+
+    --border: rgba(143, 184, 233, 0.13);
+    --border-bright: rgba(143, 184, 233, 0.28);
+
+    --text: #d8e3f0;
+    --text-dim: #8aa0bb;
+    --text-bright: #f0f5fb;
+
+    --ink: #5d8ec5;
+    --ink-dim: rgba(93, 142, 197, 0.15);
+    --ink-bright: #80a8d8;
+
+    --accent: #e6b94a;
+    --accent-dim: rgba(230, 185, 74, 0.14);
+
+    --rose: #d76f87;
+    --rose-dim: rgba(215, 111, 135, 0.14);
+
+    --sage: #8ec56b;
+    --sage-dim: rgba(142, 197, 107, 0.14);
+
+    --red: var(--rose);
+    --red-dim: var(--rose-dim);
+    --green: var(--sage);
+    --green-dim: var(--sage-dim);
+    --orange: var(--accent);
+    --orange-dim: var(--accent-dim);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+
+/* ============== Hero ============== */
+
+.hero {
+  position: relative;
+  padding: 56px 0 48px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 64px;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 120px; height: 6px;
+  background: var(--accent);
+}
+
+.hero__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--ink);
+  padding: 6px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--surface);
+  margin-bottom: 28px;
+}
+
+.hero__label::before {
+  content: 'PRD';
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 8vw, 92px);
+  line-height: 0.95;
+  letter-spacing: -2px;
+  margin: 0 0 20px;
+  color: var(--text-bright);
+}
+
+.hero__title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.hero__subtitle {
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.5;
+  color: var(--text-dim);
+  max-width: 860px;
+  margin: 0 0 36px;
+}
+
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+  max-width: 800px;
+  border-top: 1px solid var(--border);
+  padding-top: 28px;
+}
+
+.hero__stat-value {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__stat-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+/* ============== Section ============== */
+
+section {
+  margin-bottom: 80px;
+}
+
+.section-head {
+  margin-bottom: 36px;
+  position: relative;
+  padding-left: 24px;
+  border-left: 3px solid var(--ink);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 3.5vw, 40px);
+  line-height: 1.1;
+  margin: 0 0 12px;
+  color: var(--text-bright);
+  letter-spacing: -0.6px;
+}
+
+.section-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.section-lead {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  max-width: 800px;
+  margin: 0;
+}
+
+/* ============== Comparison Panels ============== */
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.comparison > * { min-width: 0; }
+
+.compare-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.compare-panel--before {
+  border-color: var(--rose);
+}
+
+.compare-panel--after {
+  border-color: var(--ink-bright);
+  background: linear-gradient(180deg, var(--ink-dim) 0%, var(--surface) 100%);
+}
+
+.compare-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-panel__head--before {
+  color: var(--rose);
+  background: var(--rose-dim);
+  border-bottom-color: var(--rose);
+}
+
+.compare-panel__head--after {
+  color: var(--ink-bright);
+  background: var(--ink-dim);
+  border-bottom-color: var(--ink-bright);
+}
+
+.compare-panel__head::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.compare-panel__body {
+  padding: 24px 28px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.compare-panel__body p { margin: 0 0 14px; }
+.compare-panel__body p:last-child { margin-bottom: 0; }
+
+.compare-panel__body code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 6px;
+  background: var(--surface-recessed);
+  border-radius: 3px;
+}
+
+@media (max-width: 900px) {
+  .comparison { grid-template-columns: 1fr; }
+}
+
+/* ============== Module sketch ============== */
+
+.layer {
+  margin-bottom: 28px;
+}
+
+.layer__head {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-bright);
+}
+
+.layer__num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 60px;
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -2px;
+}
+
+.layer__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  margin: 0;
+  color: var(--text-bright);
+  flex: 1;
+}
+
+.layer__meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.module-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 22px 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.module-card--deep {
+  background: var(--surface-elevated);
+  border-left: 3px solid var(--ink);
+  box-shadow: 0 2px 12px rgba(30, 58, 95, 0.05);
+}
+
+.module-card--thin {
+  border-left: 3px solid var(--border-bright);
+}
+
+.module-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.module-card__name {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin: 0;
+}
+
+.module-card__depth {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+}
+
+.module-card__depth--deep {
+  color: var(--accent);
+}
+
+.module-card__depth--thin {
+  color: var(--text-dim);
+}
+
+.module-card__purpose {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0 0 14px;
+}
+
+.module-card__verbs {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.verb-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 9px;
+  background: var(--ink-dim);
+  color: var(--ink-bright);
+  border-radius: 2px;
+}
+
+/* ============== Stories ============== */
+
+.stories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+  gap: 24px;
+}
+
+.story-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 26px 28px;
+  position: relative;
+}
+
+.story-group::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--group-color, var(--ink));
+}
+
+.story-group--ink { --group-color: var(--ink); }
+.story-group--accent { --group-color: var(--accent); }
+.story-group--sage { --group-color: var(--sage); }
+.story-group--rose { --group-color: var(--rose); }
+
+.story-group__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.story-group__actor {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--group-color, var(--ink));
+  background: var(--surface-recessed);
+  padding: 3px 9px;
+  font-weight: 400;
+}
+
+.story-group__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--text-bright);
+  margin: 0;
+  flex: 1;
+}
+
+.story-group__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.story-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.story-list li {
+  position: relative;
+  padding-left: 32px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  counter-increment: story;
+}
+
+.story-list li::before {
+  content: counter(story, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--group-color, var(--ink));
+  background: var(--surface-recessed);
+  padding: 2px 6px;
+}
+
+.story-list {
+  counter-reset: story;
+}
+
+.story-list strong {
+  font-weight: 600;
+  color: var(--text-bright);
+}
+
+.story-list em {
+  font-style: normal;
+  color: var(--group-color, var(--ink));
+  font-weight: 500;
+}
+
+/* ============== Tables ============== */
+
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.data-table thead {
+  background: var(--ink-dim);
+}
+
+.data-table th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ink-bright);
+  text-align: left;
+  padding: 14px 20px;
+  border-bottom: 2px solid var(--ink-bright);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text);
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.data-table tbody tr:nth-child(even) {
+  background: var(--surface-recessed);
+}
+
+.data-table code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+
+.data-table td.col-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-bright);
+  white-space: nowrap;
+}
+
+/* ============== Tags ============== */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  background: var(--ink-dim);
+  color: var(--ink-bright);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.tag--accent { background: var(--accent-dim); color: var(--accent); }
+.tag--sage { background: var(--sage-dim); color: var(--sage); }
+.tag--rose { background: var(--rose-dim); color: var(--rose); }
+.tag--ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border-bright); }
+
+/* ============== Two-up ============== */
+
+.two-up {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.two-up > * { min-width: 0; }
+
+@media (max-width: 900px) {
+  .two-up { grid-template-columns: 1fr; }
+}
+
+/* ============== Shape card (Token/Config display without code) ============== */
+
+.shape-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 28px 32px;
+  position: relative;
+}
+
+.shape-card__head {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-bright);
+}
+
+.shape-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  align-items: baseline;
+}
+
+.shape-row:last-child { border-bottom: none; }
+
+.shape-row__key {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-bright);
+}
+
+.shape-row__desc {
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.shape-row__val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* ============== ADR list ============== */
+
+.adr-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 16px;
+}
+
+.adr-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ink);
+  padding: 18px 22px;
+  position: relative;
+}
+
+.adr-card__num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.adr-card__title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.adr-card__decision {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+/* ============== Callouts ============== */
+
+.callout {
+  padding: 22px 26px;
+  border-left: 4px solid var(--callout-color);
+  background: var(--callout-bg);
+  margin: 24px 0;
+}
+
+.callout--info {
+  --callout-color: var(--ink);
+  --callout-bg: var(--ink-dim);
+}
+
+.callout--warning {
+  --callout-color: var(--rose);
+  --callout-bg: var(--rose-dim);
+}
+
+.callout__title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--callout-color);
+  margin-bottom: 8px;
+}
+
+.callout__body {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.callout__body code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .callout__body code { background: rgba(255, 255, 255, 0.08); }
+}
+
+/* ============== Animations ============== */
+
+@keyframes blueFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero,
+.section-head,
+.compare-panel,
+.module-card,
+.story-group,
+.table-wrap,
+.shape-card,
+.adr-card,
+.callout {
+  animation: blueFadeIn 0.5s ease-out both;
+  animation-delay: calc(var(--i, 0) * 0.04s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============== Footer ============== */
+
+.footer {
+  margin-top: 96px;
+  padding: 32px 0 0;
+  border-top: 2px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.footer__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.footer__cell strong {
+  display: block;
+  color: var(--text);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+}
+
+.footer__path {
+  font-style: italic;
+  color: var(--ink-bright);
+}
+
+/* ============== Responsive ============== */
+
+@media (max-width: 768px) {
+  .container { padding: 32px 20px 64px; }
+  .hero { padding: 32px 0; margin-bottom: 32px; }
+  .stories { grid-template-columns: 1fr; }
+  .modules { grid-template-columns: 1fr; }
+  .data-table { font-size: 13px; }
+  .data-table th, .data-table td { padding: 10px 12px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ====== HERO ====== -->
+  <header class="hero">
+    <span class="hero__label">v0.1.0 · Phase 2</span>
+    <h1 class="hero__title">bitsmithy-auth <em>v0.1.0</em></h1>
+    <p class="hero__subtitle">A Ruby gem that turns a Phone number into a signed Token via SMS one-time code. Not a User management system — a Verification primitive that host apps build their own user lifecycles on top of.</p>
+
+    <div class="hero__stats">
+      <div>
+        <div class="hero__stat-value">33</div>
+        <div class="hero__stat-label">User stories</div>
+      </div>
+      <div>
+        <div class="hero__stat-value">08</div>
+        <div class="hero__stat-label">Modules</div>
+      </div>
+      <div>
+        <div class="hero__stat-value">06</div>
+        <div class="hero__stat-label">ADRs cited</div>
+      </div>
+      <div>
+        <div class="hero__stat-value">12</div>
+        <div class="hero__stat-label">Glossary terms</div>
+      </div>
+      <div>
+        <div class="hero__stat-value">02 / 03</div>
+        <div class="hero__stat-label">Layers in scope</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====== PROBLEM / SOLUTION ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Problem · Solution</div>
+      <h2 class="section-title">Why this gem <em>exists.</em></h2>
+      <p class="section-lead">The bitsmithy portfolio ships in Ruby, Python, and Go. Every phone-OTP implementation has been drifting from the others. This gem is the reference implementation that ends the drift.</p>
+    </div>
+
+    <div class="comparison">
+      <div class="compare-panel compare-panel--before">
+        <div class="compare-panel__head compare-panel__head--before">Current state</div>
+        <div class="compare-panel__body">
+          <p>Every app rebuilds the same plumbing — a <code>verifications</code> table, an OTP generator with expiry and attempt caps, gem-side rate limiting, a Twilio integration, a sessions controller, JWT or session encoding, Phone normalisation.</p>
+          <p>Each implementation drifts from the others. Each independently has to worry about SMS pumping fraud. Three flavours of the same code across three apps — across three languages — is unfun and lower quality than centralising it once.</p>
+        </div>
+      </div>
+
+      <div class="compare-panel compare-panel--after">
+        <div class="compare-panel__head compare-panel__head--after">After v0.1.0</div>
+        <div class="compare-panel__body">
+          <p>One <code>configure</code> block; <code>send_code</code>, <code>verify_code</code>, <code>decode_token</code>; an optional Rails Controller concern. Twilio Verify owns OTP lifecycle, so no local <code>verifications</code> table exists.</p>
+          <p>Identity is a Verification artifact carrying a Phone — never a User. The Host app maps a verified Phone to its own user records however it wants. The gem stays narrow; lifecycle decisions stay with the apps that need to make them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== MODULE SKETCH ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Module Sketch</div>
+      <h2 class="section-title">Eight modules, <em>two layers.</em></h2>
+      <p class="section-lead">Layer 1 is framework-agnostic — works in CLIs, Rake tasks, Sidekiq jobs. Layer 2 is the optional Rails Controller concern, conditionally loaded only when <code style="font-family: var(--font-mono); padding: 1px 5px; background: var(--surface-recessed); font-size: 0.9em;">ActionController</code> is defined.</p>
+    </div>
+
+    <div class="layer">
+      <div class="layer__head">
+        <span class="layer__num">01</span>
+        <h3 class="layer__name">Core API</h3>
+        <span class="layer__meta">framework-agnostic</span>
+      </div>
+      <div class="modules">
+        <div class="module-card module-card--deep">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Phone</h4>
+            <span class="module-card__depth module-card__depth--deep">Deep</span>
+          </div>
+          <p class="module-card__purpose">One method that hides all of phonelib's parsing, validation, and E.164 formatting.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">normalize</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--deep">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Token</h4>
+            <span class="module-card__depth module-card__depth--deep">Deep</span>
+          </div>
+          <p class="module-card__purpose">JWT crypto, claim shapes, issuer verification, and expiry logic — hidden behind encode/decode.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">encode</span>
+            <span class="verb-tag">decode</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--deep">
+          <div class="module-card__head">
+            <h4 class="module-card__name">OTP::Adapter</h4>
+            <span class="module-card__depth module-card__depth--deep">Deep</span>
+          </div>
+          <p class="module-card__purpose">Strategy interface. TwilioAdapter wraps Twilio Verify with error categorisation; TestAdapter skips the network and accepts the magic code.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">send_code</span>
+            <span class="verb-tag">verify_code</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--deep">
+          <div class="module-card__head">
+            <h4 class="module-card__name">RateLimiter</h4>
+            <span class="module-card__depth module-card__depth--deep">Deep</span>
+          </div>
+          <p class="module-card__purpose">Pre-Twilio gate. Counting, sliding windows, and thread-safety hidden behind one method.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">check!</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--deep">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Stores::MemoryStore</h4>
+            <span class="module-card__depth module-card__depth--deep">Deep</span>
+          </div>
+          <p class="module-card__purpose">Default Store. Mutex + window-expiry counting behind a one-method interface so Redis or DynamoDB stores can drop in later.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">increment</span>
+            <span class="verb-tag">reset</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--thin">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Config</h4>
+            <span class="module-card__depth module-card__depth--thin">Thin</span>
+          </div>
+          <p class="module-card__purpose">Settings holder. Validates at boot — missing Twilio sids or Signing key raise immediately, not at first request.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">validate!</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--thin">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Result · Identity · Errors</h4>
+            <span class="module-card__depth module-card__depth--thin">Value</span>
+          </div>
+          <p class="module-card__purpose">Immutable Data classes plus the exception hierarchy. Exception classes carry redacted-Phone messages per ADR-0004.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">success?</span>
+            <span class="verb-tag">.phone</span>
+            <span class="verb-tag">.error</span>
+          </div>
+        </div>
+
+        <div class="module-card module-card--thin">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Bitsmithy::Auth</h4>
+            <span class="module-card__depth module-card__depth--thin">Façade</span>
+          </div>
+          <p class="module-card__purpose">Public top-level surface. Composes the deep modules; converts <code style="font-family: var(--font-mono);">InvalidPhoneNumber</code> and <code style="font-family: var(--font-mono);">RateLimited</code> into failure Results.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">configure</span>
+            <span class="verb-tag">send_code</span>
+            <span class="verb-tag">verify_code</span>
+            <span class="verb-tag">decode_token</span>
+            <span class="verb-tag">normalize_phone</span>
+            <span class="verb-tag">test_mode!</span>
+            <span class="verb-tag">redact_phone</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer__head">
+        <span class="layer__num">02</span>
+        <h3 class="layer__name">Rails integration</h3>
+        <span class="layer__meta">optional · conditionally loaded</span>
+      </div>
+      <div class="modules">
+        <div class="module-card module-card--thin">
+          <div class="module-card__head">
+            <h4 class="module-card__name">Bitsmithy::Auth::Controller</h4>
+            <span class="module-card__depth module-card__depth--thin">Concern</span>
+          </div>
+          <p class="module-card__purpose">Reads and writes <code style="font-family: var(--font-mono);">session[:bitsmithy_auth_token]</code>. Memoises the decoded Identity per request; invalidates the memo on sign-in/sign-out. Deliberately omits <code style="font-family: var(--font-mono);">require_authentication!</code> — Host apps own redirect semantics.</p>
+          <div class="module-card__verbs">
+            <span class="verb-tag">current_phone</span>
+            <span class="verb-tag">current_identity</span>
+            <span class="verb-tag">authenticated?</span>
+            <span class="verb-tag">sign_in</span>
+            <span class="verb-tag">sign_out</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== USER STORIES ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">User Stories · 33 total</div>
+      <h2 class="section-title">Six actors, <em>one contract.</em></h2>
+      <p class="section-lead">Stories are grouped by actor. Each <em>actor</em> represents a different vantage point on the same gem; together they define the surface area we must hold true.</p>
+    </div>
+
+    <div class="stories">
+
+      <div class="story-group story-group--ink">
+        <div class="story-group__head">
+          <span class="story-group__actor">Host-app dev</span>
+          <h3 class="story-group__title">Integration</h3>
+          <span class="story-group__count">9 stories</span>
+        </div>
+        <ol class="story-list">
+          <li>Configure the gem in one initializer block with Twilio credentials and a <em>Signing key</em>.</li>
+          <li>Clear boot-time failure if any required config is missing.</li>
+          <li><code>send_code</code> accepts any plausible Phone format; normalisation is internal.</li>
+          <li><em>Result</em>-returning methods for expected failures (wrong code, rate-limited, Twilio outage).</li>
+          <li><code>decode_token</code> raises on tampered/expired <em>Tokens</em> — no nil-checks at every read site.</li>
+          <li>Rails Controller concern exposes <code>current_phone</code>, <code>authenticated?</code>, <code>sign_in</code>, <code>sign_out</code>.</li>
+          <li>Own the unauthenticated-redirect decision — no <code>require_authentication!</code> baked in.</li>
+          <li>Use the gem from non-Rails code (CLI, Rake, Sidekiq) — core API needs no Rails.</li>
+          <li>Same Identity contract across Ruby, Python, Go implementations.</li>
+        </ol>
+      </div>
+
+      <div class="story-group story-group--rose">
+        <div class="story-group__head">
+          <span class="story-group__actor">Host-app dev</span>
+          <h3 class="story-group__title">Error handling</h3>
+          <span class="story-group__count">4 stories</span>
+        </div>
+        <ol class="story-list">
+          <li>Twilio failures categorised into four symbols — page oncall on auth errors, show "try again" for service outages.</li>
+          <li><code>:invalid_phone_number</code> Result for unparseable Phone input.</li>
+          <li><code>:invalid_code</code> Result when the user types the wrong OTP.</li>
+          <li><code>:rate_limited</code> Result when too many <code>send_code</code> calls hit the same Phone in the window.</li>
+        </ol>
+      </div>
+
+      <div class="story-group story-group--accent">
+        <div class="story-group__head">
+          <span class="story-group__actor">End user</span>
+          <h3 class="story-group__title">Verification flow</h3>
+          <span class="story-group__count">6 stories</span>
+        </div>
+        <ol class="story-list">
+          <li>Enter Phone, receive SMS.</li>
+          <li>Format-agnostic input — spaces, dashes, parens, dots, raw E.164 all accepted.</li>
+          <li>"Please wait" feedback when rate-limited.</li>
+          <li>Enter six-digit code, get signed in.</li>
+          <li>Wrong-code attempt fails clearly and allows retry.</li>
+          <li>Stay signed in for ~24 hours without re-verifying.</li>
+        </ol>
+      </div>
+
+      <div class="story-group story-group--sage">
+        <div class="story-group__head">
+          <span class="story-group__actor">Operator</span>
+          <h3 class="story-group__title">Running in production</h3>
+          <span class="story-group__count">8 stories</span>
+        </div>
+        <ol class="story-list">
+          <li>Exception messages redact Phones (per ADR-0004) — Sentry/Honeybadger never index full numbers.</li>
+          <li>Public <code>redact_phone</code> helper for use in Host-app log statements.</li>
+          <li>Default Rate limit (5 sends per Phone per hour) before Twilio is called — abuse incidents capped.</li>
+          <li>Pluggable Store interface — swap to Redis when single-process state stops being enough.</li>
+          <li>Signing-key rotation is viable; consequence = all <em>Tokens</em> invalidated.</li>
+          <li>Stateless <em>Tokens</em> (ADR-0001) — authenticated request handling never hits a runtime store.</li>
+          <li><code>test_mode!</code> refuses in production-like envs and outside Rails (ADR-0002).</li>
+          <li>Gem itself never logs a Phone — logging contract belongs to the Host app.</li>
+        </ol>
+      </div>
+
+      <div class="story-group story-group--ink">
+        <div class="story-group__head">
+          <span class="story-group__actor">Test author</span>
+          <h3 class="story-group__title">Testing Host apps</h3>
+          <span class="story-group__count">3 stories</span>
+        </div>
+        <ol class="story-list">
+          <li>Test mode swaps the OTP adapter — controller and feature tests run without Twilio.</li>
+          <li>Magic OTP <code>"000000"</code> always verifies in Test mode.</li>
+          <li>Test mode <code>send_code</code> always succeeds — no Twilio mocks needed.</li>
+        </ol>
+      </div>
+
+      <div class="story-group story-group--accent">
+        <div class="story-group__head">
+          <span class="story-group__actor">Maintainer</span>
+          <h3 class="story-group__title">The gem itself</h3>
+          <span class="story-group__count">3 stories</span>
+        </div>
+        <ol class="story-list">
+          <li>OTP::Adapter interface small enough that a VonageAdapter or MessageBirdAdapter could ship later without breaking the public surface.</li>
+          <li>Controller concern conditionally loaded only when <code>ActionController</code> is defined — non-Rails apps incur zero Rails-load cost.</li>
+          <li>Every public method has at least one happy-path and one failure-path test — contract enforced by tests, not comments.</li>
+        </ol>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====== RESULT VS RAISE ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Implementation Decisions</div>
+      <h2 class="section-title">Result, <em>or</em> raise?</h2>
+      <p class="section-lead">Methods that fail on expected user input return a Result. Methods that fail only on programmer error or tampering raise. The convention applies to all of Layer 1's public surface.</p>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>On success</th>
+              <th>On failure</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>send_code(phone)</code></td>
+              <td><span class="tag tag--sage">Result.success</span></td>
+              <td><span class="tag tag--sage">Result.failure</span></td>
+              <td>Rate limits and Twilio outages are expected — branchable.</td>
+            </tr>
+            <tr>
+              <td><code>verify_code(phone, code)</code></td>
+              <td><span class="tag tag--sage">Result.success(+token)</span></td>
+              <td><span class="tag tag--sage">Result.failure</span></td>
+              <td>Wrong codes are normal user flow, not exceptional.</td>
+            </tr>
+            <tr>
+              <td><code>decode_token(token)</code></td>
+              <td><span class="tag">Identity</span></td>
+              <td><span class="tag tag--rose">raises InvalidToken</span></td>
+              <td>Bad Token means tampering or expiry — not normal flow.</td>
+            </tr>
+            <tr>
+              <td><code>normalize_phone(input, country:)</code></td>
+              <td><span class="tag">String (E.164)</span></td>
+              <td><span class="tag tag--rose">raises InvalidPhoneNumber</span></td>
+              <td>Caller validates at boundary; reaching here invalid = bug.</td>
+            </tr>
+            <tr>
+              <td><code>configure { |c| ... }</code></td>
+              <td><span class="tag tag--accent">Config</span></td>
+              <td><span class="tag tag--rose">raises ConfigurationError</span></td>
+              <td>Missing config is boot-time, not a runtime branch.</td>
+            </tr>
+            <tr>
+              <td><code>test_mode!</code></td>
+              <td><span class="tag tag--accent">Config (mutated)</span></td>
+              <td><span class="tag tag--rose">raises ConfigurationError</span></td>
+              <td>Misuse in production is a developer error (ADR-0002).</td>
+            </tr>
+            <tr>
+              <td><code>redact_phone(phone)</code></td>
+              <td><span class="tag">String (masked)</span></td>
+              <td>—</td>
+              <td>Pure transformation; cannot fail.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ERROR SYMBOL VOCABULARY ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Error Symbol Vocabulary</div>
+      <h2 class="section-title">Nine symbols, <em>three sources.</em></h2>
+      <p class="section-lead">Every <code style="font-family: var(--font-mono); padding: 1px 5px; background: var(--surface-recessed); font-size: 0.9em;">Result.failure</code> a Host app sees carries one of these. Originate either gem-side, in Twilio's Verify API, or in our own normalisation logic.</p>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Source</th>
+              <th>Meaning</th>
+              <th>Host-app response</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-mono">:invalid_phone_number</td>
+              <td><span class="tag">gem / Twilio 60200</span></td>
+              <td>Phone failed normalisation, or Twilio rejected the format.</td>
+              <td>Inline form error.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:invalid_code</td>
+              <td><span class="tag">Twilio Verify</span></td>
+              <td>User typed the wrong OTP.</td>
+              <td>Re-render verify step with inline error.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:rate_limited</td>
+              <td><span class="tag">gem</span></td>
+              <td>Gem-side Rate limiter triggered (default 5/hour/Phone).</td>
+              <td>"Please wait" message.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:max_send_attempts</td>
+              <td><span class="tag">Twilio 60203</span></td>
+              <td>Twilio's per-Phone send cap reached.</td>
+              <td>"Please wait" message (back off longer).</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:max_check_attempts</td>
+              <td><span class="tag">Twilio 60202</span></td>
+              <td>Too many verification attempts against one code.</td>
+              <td>Force a re-send.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:twilio_authentication_error</td>
+              <td><span class="tag tag--rose">Twilio 401</span></td>
+              <td>Host app's Twilio credentials are wrong.</td>
+              <td>Page oncall — not a user-facing issue.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:twilio_rate_limited</td>
+              <td><span class="tag tag--rose">Twilio 429</span></td>
+              <td>Twilio is throttling the whole account.</td>
+              <td>Backoff with jitter; alert oncall.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:twilio_service_unavailable</td>
+              <td><span class="tag tag--rose">Twilio 5xx / timeout</span></td>
+              <td>Twilio is having an incident.</td>
+              <td>Retry, or fail open with maintenance page.</td>
+            </tr>
+            <tr>
+              <td class="col-mono">:twilio_error</td>
+              <td><span class="tag tag--ghost">fallback</span></td>
+              <td>Unmapped Twilio error — investigate.</td>
+              <td>Show "try again" toast; investigate log.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== TOKEN & CONFIG SHAPE ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Token · Config</div>
+      <h2 class="section-title">What's on the <em>wire</em>, what's in <em>config</em>.</h2>
+      <p class="section-lead">The Token is a stateless HS256 JWT (ADR-0001). Config holds Twilio credentials, the Signing key, and the two tunable defaults that affect Host-app behaviour.</p>
+    </div>
+
+    <div class="two-up">
+      <div class="shape-card">
+        <div class="shape-card__head">Token claims</div>
+        <div class="shape-row">
+          <span class="shape-row__key">sub</span>
+          <span class="shape-row__desc">Verified Phone in E.164.</span>
+          <span class="shape-row__val">String</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">iat</span>
+          <span class="shape-row__desc">Time the Token was issued.</span>
+          <span class="shape-row__val">Integer · Unix</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">exp</span>
+          <span class="shape-row__desc">iat + session_duration (24h default).</span>
+          <span class="shape-row__val">Integer · Unix</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">iss</span>
+          <span class="shape-row__desc">Always "bitsmithy-auth" — verified on decode.</span>
+          <span class="shape-row__val">String</span>
+        </div>
+      </div>
+
+      <div class="shape-card">
+        <div class="shape-card__head">Config fields</div>
+        <div class="shape-row">
+          <span class="shape-row__key">twilio_account_sid</span>
+          <span class="shape-row__desc">From Twilio console.</span>
+          <span class="shape-row__val">required</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">twilio_auth_token</span>
+          <span class="shape-row__desc">From Twilio console.</span>
+          <span class="shape-row__val">required</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">twilio_verify_service_sid</span>
+          <span class="shape-row__desc">Per-Host-app Verify Service.</span>
+          <span class="shape-row__val">required</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">signing_key</span>
+          <span class="shape-row__desc">≥ 32 bytes random; HMAC secret.</span>
+          <span class="shape-row__val">required</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">session_duration</span>
+          <span class="shape-row__desc">Token lifetime in seconds.</span>
+          <span class="shape-row__val">86_400 (24h)</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">rate_limit</span>
+          <span class="shape-row__desc">{ per_phone:, window: }</span>
+          <span class="shape-row__val">5 / 1h</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">otp_adapter</span>
+          <span class="shape-row__desc">Swappable — TwilioAdapter default.</span>
+          <span class="shape-row__val">lazy default</span>
+        </div>
+        <div class="shape-row">
+          <span class="shape-row__key">rate_limit_store</span>
+          <span class="shape-row__desc">Pluggable — MemoryStore default.</span>
+          <span class="shape-row__val">lazy default</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout--info">
+      <div class="callout__title">PII Redaction</div>
+      <p class="callout__body">Phone numbers are masked in every exception the gem raises — <code>+15555551234</code> becomes <code>+1******1234</code> before reaching error trackers (per ADR-0004). The gem exports <code>Bitsmithy::Auth.redact_phone</code> as a public helper so Host apps can use the same redaction in their own log statements. <code>Result#phone</code> stays unredacted (the success path needs it); README will steer Host apps toward <code>redact_phone(result.phone)</code> in any log line.</p>
+    </div>
+  </section>
+
+  <!-- ====== ADRs ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Architectural Decisions</div>
+      <h2 class="section-title">Six ADRs <em>load-bearing</em> for this PRD.</h2>
+      <p class="section-lead">Each ADR captures a decision that's hard to reverse, surprising without context, and the result of a real trade-off. Stored at <code style="font-family: var(--font-mono); padding: 1px 5px; background: var(--surface-recessed); font-size: 0.9em;">docs/adr/</code> at the repo root.</p>
+    </div>
+
+    <div class="adr-list">
+      <div class="adr-card">
+        <div class="adr-card__num">ADR-0001</div>
+        <h3 class="adr-card__title">Stateless JWT without revocation</h3>
+        <p class="adr-card__decision">Tokens are signed JWTs; <code style="font-family: var(--font-mono);">sign_out</code> only clears the session cookie. <code style="font-family: var(--font-mono);">session_duration</code> defaults to 24h. Hard revocation is the Host app's job if it ever needs it.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-card__num">ADR-0002</div>
+        <h3 class="adr-card__title">Test mode is Rails-env-guarded</h3>
+        <p class="adr-card__decision"><code style="font-family: var(--font-mono);">test_mode!</code> raises unless <code style="font-family: var(--font-mono);">Rails.env.test?</code> or <code style="font-family: var(--font-mono);">Rails.env.development?</code> is true. No ENV escape hatch. Non-Rails contexts refuse outright.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-card__num">ADR-0003</div>
+        <h3 class="adr-card__title">Verification primitive, not user system</h3>
+        <p class="adr-card__decision">The gem owns Verification only. User records, sign-up vs sign-in, phone-change flows, revocation lists — all Host-app concerns. No <code style="font-family: var(--font-mono);">Bitsmithy::Auth::User</code> will ever exist.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-card__num">ADR-0004</div>
+        <h3 class="adr-card__title">Redact phones in exceptions</h3>
+        <p class="adr-card__decision">Phones in exception messages are masked to <code style="font-family: var(--font-mono);">+1******1234</code>. The gem ships <code style="font-family: var(--font-mono);">redact_phone</code> as a public helper for Host-app logs.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-card__num">ADR-0005</div>
+        <h3 class="adr-card__title">Twilio Verify as OTP backend</h3>
+        <p class="adr-card__decision">Twilio Verify owns OTP generation, expiry, attempts, and SMS-pumping fraud detection. Gem never stores OTPs. ~$0.05 per verification is worth not maintaining the plumbing.</p>
+      </div>
+
+      <div class="adr-card">
+        <div class="adr-card__num">ADR-0006</div>
+        <h3 class="adr-card__title">Pattern A cross-language naming</h3>
+        <p class="adr-card__decision">Language goes in the repo name, NOT the package name. Gem: <code style="font-family: var(--font-mono);">bitsmithy-auth</code>. Repo: <code style="font-family: var(--font-mono);">bitsmithy/auth-ruby</code>. Module: <code style="font-family: var(--font-mono);">Bitsmithy::Auth</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== OUT OF SCOPE ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Out of Scope</div>
+      <h2 class="section-title">What v0.1.0 deliberately <em>does not</em> do.</h2>
+      <p class="section-lead">Each exclusion has a reason. "We ran out of time" is not one of them. Some are deferred; some are permanent boundaries the gem will never cross.</p>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Concern</th>
+              <th>Status</th>
+              <th>Why excluded</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Mountable Rails engine + default sign-in views</td>
+              <td><span class="tag tag--accent">v0.2.0</span></td>
+              <td>Right shared UI is unknown until 2–3 Host apps converge. Each writes its own ~30-line SessionsController in the meantime.</td>
+            </tr>
+            <tr>
+              <td>Install generator</td>
+              <td><span class="tag tag--accent">v0.2.0</span></td>
+              <td>Pairs with the engine. Premature until there's something worth generating.</td>
+            </tr>
+            <tr>
+              <td>Redis-backed Rate-limit Store</td>
+              <td><span class="tag tag--accent">v0.2.0</span></td>
+              <td>Interface is in place. Adapter ships when first Host app needs multi-worker correctness.</td>
+            </tr>
+            <tr>
+              <td>Voice / WhatsApp OTP channels</td>
+              <td><span class="tag tag--accent">later</span></td>
+              <td>Twilio Verify supports both. Extending later is a one-symbol change.</td>
+            </tr>
+            <tr>
+              <td>Email OTP / TOTP / authenticator apps</td>
+              <td><span class="tag tag--accent">later</span></td>
+              <td>Phone-only is the v0.1.0 scope. If we add these they'll likely be a different gem.</td>
+            </tr>
+            <tr>
+              <td>Per-Host-app SMS template overrides from the gem</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>Twilio Verify Services already support per-service templates Twilio-side.</td>
+            </tr>
+            <tr>
+              <td>Signing-key rotation with overlap window</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>Single key. Rotation = sign-out-all. Documented as a deliberate non-feature in ADR-0001.</td>
+            </tr>
+            <tr>
+              <td>Hard Token revocation</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>Host-app concern. Pattern documented in ADR-0001.</td>
+            </tr>
+            <tr>
+              <td>Phone-number-change primitives</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>Host-app concern. Implemented by re-running Verification against the new Phone.</td>
+            </tr>
+            <tr>
+              <td><code>Bitsmithy::Auth::User</code> model, sessions table, gem-owned state</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>See ADR-0003. Cuts against the verification-primitive boundary.</td>
+            </tr>
+            <tr>
+              <td><code>require_authentication!</code> Controller helper</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>Host apps own redirect semantics — the gem won't encode a single answer.</td>
+            </tr>
+            <tr>
+              <td>Automatic log scrubbing (Lograge filter, etc.)</td>
+              <td><span class="tag tag--rose">never (in-gem)</span></td>
+              <td>The <code>redact_phone</code> helper is enough; Host apps wire logging themselves.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== TESTING ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Testing Decisions</div>
+      <h2 class="section-title">TDD by default. <em>Behaviour over implementation.</em></h2>
+      <p class="section-lead">Every public method has at least one happy-path and one failure-path test. Names read as sentences. One assertion per test where possible.</p>
+    </div>
+
+    <div class="two-up">
+      <div class="shape-card">
+        <div class="shape-card__head">What gets tested</div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Phone</span>
+          <span class="shape-row__desc">Format variations · raise paths · redacted exception messages</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Token</span>
+          <span class="shape-row__desc">Encode/decode round-trip · expiry · wrong-key · wrong-issuer</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Config</span>
+          <span class="shape-row__desc">Defaults · validate! per required field</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">RateLimiter</span>
+          <span class="shape-row__desc">Boundary at limit · per-key isolation</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">MemoryStore</span>
+          <span class="shape-row__desc">Counting · window expiry · explicit reset · per-key isolation</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">OTP::TestAdapter</span>
+          <span class="shape-row__desc">Always-succeed send · magic-code semantics</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">OTP::TwilioAdapter</span>
+          <span class="shape-row__desc">SDK chain shape · four error-symbol categorisations · success path</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Bitsmithy::Auth</span>
+          <span class="shape-row__desc">Wiring · rate-limit conversion to Result · Phone normalisation in pipeline</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Controller</span>
+          <span class="shape-row__desc">Session reads/writes · memoisation invalidation on sign_in/sign_out</span>
+        </div>
+      </div>
+
+      <div class="shape-card">
+        <div class="shape-card__head">Test-stack choices</div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Framework</span>
+          <span class="shape-row__desc">Minitest (gem scaffold default).</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Stubbing</span>
+          <span class="shape-row__desc">Mocha for the Twilio SDK chain. <strong>Not</strong> WebMock — we couple to the SDK shape, not the wire format.</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Concern tests</span>
+          <span class="shape-row__desc">Minimal fake controller class with a <code style="font-family: var(--font-mono);">session</code> hash. <code style="font-family: var(--font-mono);">actionpack</code> added to <code style="font-family: var(--font-mono);">:test</code> group.</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Helper</span>
+          <span class="shape-row__desc">Shared <code style="font-family: var(--font-mono);">ConfigHelper</code> mixin resets gem config in every <code style="font-family: var(--font-mono);">setup</code>.</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Style</span>
+          <span class="shape-row__desc">Nested <code style="font-family: var(--font-mono);">module Bitsmithy; module Auth; class TestX</code> per Rubocop's <code style="font-family: var(--font-mono);">ClassAndModuleChildren: nested</code>.</span>
+        </div>
+        <div class="shape-row" style="grid-template-columns: 180px 1fr;">
+          <span class="shape-row__key">Coverage target</span>
+          <span class="shape-row__desc">Behavioural completeness, not line %. Every public method gets happy + failure.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FURTHER NOTES ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Further Notes</div>
+      <h2 class="section-title">Distribution, persistence, conventions.</h2>
+    </div>
+
+    <div class="callout callout--info">
+      <div class="callout__title">Distribution</div>
+      <p class="callout__body">Consumed via <code>gem 'bitsmithy-auth', github: 'bitsmithy/auth-ruby'</code> Gemfile entries — not published to rubygems.org. The gemspec's <code>allowed_push_host</code> is intentionally commented out; flip it to GitHub Packages or a private registry later if needed.</p>
+    </div>
+
+    <div class="callout callout--info">
+      <div class="callout__title">Persistence</div>
+      <p class="callout__body">The gem has no opinion on persistence. A Host app integrating it does not need to add any migrations. The only persistent state is whatever the Host app chooses to do with the verified Phone (typically a <code>users.phone</code> column).</p>
+    </div>
+
+    <div class="callout callout--info">
+      <div class="callout__title">Signing key generation</div>
+      <p class="callout__body">README will tell Host apps to run <code>SecureRandom.hex(32)</code> and store the result in their secrets manager. The default <code>session_duration</code> (24h) is overridable per Host app — admin tools may want 1h, marketing sites may want 7d.</p>
+    </div>
+
+    <div class="callout callout--info">
+      <div class="callout__title">Cross-language portfolio</div>
+      <p class="callout__body">This gem is the reference implementation. <code>bitsmithy/auth-python</code> and <code>bitsmithy/auth-go</code> will mirror its public semantics: the verbs, the error symbols, the Identity shape, the Token claim structure. Decisions taken here are binding on those repos.</p>
+    </div>
+  </section>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <div class="footer__row">
+      <div class="footer__cell">
+        <strong>PRD</strong>
+        <div>bitsmithy-auth v0.1.0 — initial implementation</div>
+        <div class="footer__path">docs/claude/20260526-1948-initial-implementation/prd.md</div>
+      </div>
+      <div class="footer__cell" style="text-align: right;">
+        <strong>Awaiting annotation</strong>
+        <div>Add <code style="font-family: var(--font-mono); background: var(--surface-recessed); padding: 1px 5px;">//</code> notes inline, then say "address my notes"</div>
+        <div class="footer__path">Next: /tasks</div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

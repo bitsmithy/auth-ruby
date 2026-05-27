@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasks — bitsmithy-auth v0.1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+  --bg: #faf5e8;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-recessed: #f0e8d2;
+  --terminal: #1a1410;
+
+  --border: rgba(58, 38, 16, 0.13);
+  --border-bright: rgba(58, 38, 16, 0.28);
+
+  --text: #2a2018;
+  --text-dim: #6b5a44;
+  --text-bright: #15110a;
+
+  --amber: #b58218;
+  --amber-dim: rgba(181, 130, 24, 0.12);
+  --amber-bright: #d4a73a;
+
+  --sage: #4d7c0f;
+  --sage-dim: rgba(77, 124, 15, 0.14);
+
+  --rose: #c2410c;
+  --rose-dim: rgba(194, 65, 12, 0.12);
+
+  --red: var(--rose);
+  --red-dim: var(--rose-dim);
+  --green: var(--sage);
+  --green-dim: var(--sage-dim);
+  --orange: var(--amber);
+  --orange-dim: var(--amber-dim);
+
+  --node-a: var(--amber);
+  --node-a-dim: var(--amber-dim);
+  --node-b: var(--sage);
+  --node-b-dim: var(--sage-dim);
+  --node-c: var(--rose);
+  --node-c-dim: var(--rose-dim);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0a08;
+    --surface: #1a1410;
+    --surface-elevated: #221a14;
+    --surface-recessed: #07060e;
+
+    --border: rgba(230, 200, 150, 0.10);
+    --border-bright: rgba(230, 200, 150, 0.24);
+
+    --text: #f0e8d8;
+    --text-dim: #a8997f;
+    --text-bright: #fdf6e7;
+
+    --amber: #e6a23c;
+    --amber-dim: rgba(230, 162, 60, 0.14);
+    --amber-bright: #f0b250;
+
+    --sage: #92c065;
+    --sage-dim: rgba(146, 192, 101, 0.14);
+
+    --rose: #e07a4a;
+    --rose-dim: rgba(224, 122, 74, 0.14);
+
+    --red: var(--rose);
+    --red-dim: var(--rose-dim);
+    --green: var(--sage);
+    --green-dim: var(--sage-dim);
+    --orange: var(--amber);
+    --orange-dim: var(--amber-dim);
+
+    --node-a: var(--amber);
+    --node-a-dim: var(--amber-dim);
+    --node-b: var(--sage);
+    --node-b-dim: var(--sage-dim);
+    --node-c: var(--rose);
+    --node-c-dim: var(--rose-dim);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 80% 0%, var(--amber-dim) 0%, transparent 55%),
+    radial-gradient(ellipse at 0% 100%, var(--sage-dim) 0%, transparent 50%);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+}
+
+/* ============== Hero ============== */
+
+.hero {
+  position: relative;
+  margin-bottom: 72px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero__top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.hero__phase {
+  background: var(--amber);
+  color: var(--bg);
+  padding: 6px 14px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
+.hero__breadcrumb {
+  letter-spacing: 1.2px;
+}
+
+.hero__breadcrumb strong {
+  color: var(--amber);
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(48px, 8vw, 88px);
+  line-height: 0.95;
+  letter-spacing: -2px;
+  margin: 0 0 20px;
+  color: var(--text-bright);
+}
+
+.hero__title em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--amber);
+}
+
+.hero__subtitle {
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  max-width: 820px;
+  margin: 0 0 40px;
+}
+
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0;
+  border: 1px solid var(--border-bright);
+  background: var(--surface);
+}
+
+.hero__stat {
+  padding: 22px 24px;
+  border-right: 1px solid var(--border);
+}
+
+.hero__stat:last-child { border-right: none; }
+
+.hero__stat-value {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--amber);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__stat-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.hero__stat--afk .hero__stat-value { color: var(--sage); }
+.hero__stat--hitl .hero__stat-value { color: var(--rose); }
+
+@media (max-width: 600px) {
+  .hero__stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero__stat:last-child { border-bottom: none; }
+}
+
+/* ============== Section ============== */
+
+section { margin-bottom: 72px; }
+
+.section-head { margin-bottom: 32px; }
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--amber);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.section-label::before {
+  content: '$';
+  font-weight: 700;
+  color: var(--amber-bright);
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--amber-dim), transparent);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 3.5vw, 40px);
+  line-height: 1.1;
+  margin: 0 0 14px;
+  color: var(--text-bright);
+  letter-spacing: -0.6px;
+}
+
+.section-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--amber);
+}
+
+.section-lead {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  max-width: 820px;
+  margin: 0;
+}
+
+/* ============== Mermaid ============== */
+
+.mermaid-wrap {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 36px 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 460px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  cursor: grab;
+}
+
+.mermaid-wrap.is-panning { cursor: grabbing; user-select: none; }
+
+.mermaid-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+.mermaid-wrap::-webkit-scrollbar-track { background: transparent; }
+.mermaid-wrap::-webkit-scrollbar-thumb { background: var(--border); }
+
+.zoom-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 2px;
+  z-index: 10;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px;
+}
+
+.zoom-controls button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.zoom-controls button:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.mermaid .nodeLabel { color: var(--text) !important; font-family: var(--font-mono) !important; font-size: 16px !important; font-weight: 500 !important; }
+.mermaid .edgeLabel { color: var(--text-dim) !important; background-color: var(--surface) !important; font-family: var(--font-mono) !important; font-size: 12px !important; }
+.mermaid .edgeLabel rect { fill: var(--surface) !important; }
+
+.mermaid-caption {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-dim);
+  margin-top: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ============== Slice cards ============== */
+
+.slices {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.slice {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+}
+
+.slice--afk { border-left: 4px solid var(--sage); }
+.slice--hitl { border-left: 4px solid var(--rose); }
+
+.slice__num {
+  background: var(--surface-recessed);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--amber);
+  position: relative;
+}
+
+.slice__num::after {
+  content: 'SLICE';
+  position: absolute;
+  bottom: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.slice__body {
+  padding: 28px 32px 28px;
+}
+
+.slice__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.slice__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  margin: 0;
+  color: var(--text-bright);
+  letter-spacing: -0.3px;
+  flex: 1;
+  min-width: 280px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.badge--afk {
+  background: var(--sage);
+  color: var(--bg);
+}
+
+.badge--hitl {
+  background: var(--rose);
+  color: var(--bg);
+}
+
+.slice__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  border: 1px dashed var(--border-bright);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.slice__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slice__meta-label {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.slice__meta-value {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.slice__meta-value--block { color: var(--amber); font-weight: 600; }
+.slice__meta-value--free { color: var(--sage); font-weight: 600; }
+
+.slice__stories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.story-pin {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  border-radius: 0;
+}
+
+.slice__what {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  margin: 0 0 22px;
+  max-width: 920px;
+}
+
+.slice__what code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--surface-recessed);
+  padding: 1px 6px;
+  border-radius: 2px;
+  color: var(--text-bright);
+}
+
+.criteria {
+  border: 1px solid var(--border);
+  background: var(--surface-recessed);
+  padding: 18px 22px;
+}
+
+.criteria__head {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--amber);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.criteria__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.criteria__list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.criteria__list li::before {
+  content: '☐';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.criteria__list code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 2px;
+  color: var(--text-bright);
+}
+
+@media (max-width: 700px) {
+  .slice { grid-template-columns: 1fr; }
+  .slice__num {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row;
+    gap: 12px;
+    padding: 14px 24px;
+    font-size: 36px;
+  }
+  .slice__num::after {
+    position: static;
+    bottom: auto;
+  }
+  .slice__body { padding: 22px; }
+}
+
+/* ============== Table ============== */
+
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table-scroll { overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.data-table thead {
+  background: var(--surface-recessed);
+}
+
+.data-table th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--amber);
+  text-align: left;
+  padding: 14px 20px;
+  border-bottom: 2px solid var(--border-bright);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text);
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.data-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--surface) 96%, var(--amber) 4%);
+}
+
+.data-table code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+
+.data-table .col-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-bright);
+  white-space: nowrap;
+}
+
+.slice-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: var(--amber);
+  color: var(--bg);
+  margin: 0 2px;
+}
+
+/* ============== Footer ============== */
+
+.footer {
+  margin-top: 96px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.footer strong {
+  display: block;
+  color: var(--amber);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+}
+
+/* ============== Animations ============== */
+
+@keyframes ttyFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero,
+.section-head,
+.mermaid-wrap,
+.slice,
+.table-wrap {
+  animation: ttyFade 0.4s ease-out both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 32px 18px 64px; }
+  .data-table { font-size: 13px; }
+  .data-table th, .data-table td { padding: 10px 12px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero__top">
+      <span class="hero__phase">BUILD · PHASE 3</span>
+      <span class="hero__breadcrumb">/grill · /prd · <strong>/tasks</strong> · /implement-coach</span>
+    </div>
+    <h1 class="hero__title">bitsmithy-auth <em>v0.1.0</em> — Tasks</h1>
+    <p class="hero__subtitle">Seven vertical slices. Each is a tracer bullet through the gem's architecture, demoable on its own. Slice 01 establishes the spine; slices 02–06 thicken it along independent axes; slice 07 documents the result.</p>
+
+    <div class="hero__stats">
+      <div class="hero__stat">
+        <div class="hero__stat-value">07</div>
+        <div class="hero__stat-label">Slices</div>
+      </div>
+      <div class="hero__stat hero__stat--afk">
+        <div class="hero__stat-value">06</div>
+        <div class="hero__stat-label">AFK</div>
+      </div>
+      <div class="hero__stat hero__stat--hitl">
+        <div class="hero__stat-value">01</div>
+        <div class="hero__stat-label">HITL</div>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__stat-value">33</div>
+        <div class="hero__stat-label">Stories covered</div>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__stat-value">06</div>
+        <div class="hero__stat-label">ADRs honoured</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ DEPENDENCY GRAPH ============ -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Dependency graph</div>
+      <h2 class="section-title">Slice 01 is the <em>bottleneck</em> — everything else parallelises.</h2>
+      <p class="section-lead">Once the tracer bullet is in place, slices 02–06 can be picked up by anyone in any order. Slice 07 closes the loop with documentation that requires all features to exist.</p>
+    </div>
+
+    <div class="mermaid-wrap">
+      <div class="zoom-controls">
+        <button onclick="zoomDiagram(this, 1.2)" title="Zoom in">+</button>
+        <button onclick="zoomDiagram(this, 0.83)" title="Zoom out">&minus;</button>
+        <button onclick="resetZoom(this)" title="Reset">&#8634;</button>
+      </div>
+      <pre class="mermaid">
+flowchart TD
+  S1["SLICE 01<br/>Tracer · happy path<br/>AFK"]
+  S2["SLICE 02<br/>Failure paths<br/>AFK"]
+  S3["SLICE 03<br/>TwilioAdapter<br/>AFK"]
+  S4["SLICE 04<br/>Rate limit<br/>AFK"]
+  S5["SLICE 05<br/>test_mode env guard<br/>AFK"]
+  S6["SLICE 06<br/>Rails Controller<br/>AFK"]
+  S7["SLICE 07<br/>README + CHANGELOG<br/>HITL"]
+
+  S1 --> S2
+  S1 --> S3
+  S1 --> S4
+  S1 --> S5
+  S1 --> S6
+  S2 --> S7
+  S3 --> S7
+  S4 --> S7
+  S5 --> S7
+  S6 --> S7
+
+  classDef tracer fill:#b5821833,stroke:#b58218,stroke-width:3px
+  classDef afk fill:#4d7c0f22,stroke:#4d7c0f,stroke-width:2px
+  classDef hitl fill:#c2410c22,stroke:#c2410c,stroke-width:2px
+  class S1 tracer
+  class S2,S3,S4,S5,S6 afk
+  class S7 hitl
+      </pre>
+    </div>
+    <p class="mermaid-caption">→ amber = tracer · green = AFK · red = HITL ·  bottleneck = slice 01</p>
+  </section>
+
+  <!-- ============ SLICES ============ -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">The seven slices</div>
+      <h2 class="section-title">Demoable, <em>vertical</em>, dependency-ordered.</h2>
+      <p class="section-lead">Each slice cuts through every layer end-to-end and produces a verifiable behaviour change. No slice is a "build the X module" layer — every slice has a Host-app developer's hand on the demo button.</p>
+    </div>
+
+    <div class="slices">
+
+      <!-- ===== SLICE 1 ===== -->
+      <article class="slice slice--afk">
+        <div class="slice__num">01</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">End-to-end Verification happy path (the tracer bullet)</h3>
+            <span class="badge badge--afk">AFK</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--free">none · start immediately</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">01</span>
+                <span class="story-pin">03</span>
+                <span class="story-pin">08</span>
+                <span class="story-pin">09</span>
+                <span class="story-pin">14</span>
+                <span class="story-pin">15</span>
+                <span class="story-pin">17</span>
+                <span class="story-pin">19</span>
+                <span class="story-pin">21</span>
+                <span class="story-pin">24</span>
+                <span class="story-pin">25</span>
+                <span class="story-pin">29</span>
+                <span class="story-pin">30</span>
+                <span class="story-pin">31</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">The thinnest possible line that proves the architecture works end-to-end: a Host-app developer can <code>configure</code> the gem with a Signing key, call <code>test_mode!</code>, send a code to a Phone in any plausible format, verify with <code>"000000"</code>, get back a signed Token, and decode that Token into an Identity carrying the verified Phone. Every layer of the core API is built — Phone normalisation, Token encoding/decoding, Result and Identity value types, error class hierarchy, Config holder, OTP::TestAdapter, and the top-level <code>Bitsmithy::Auth</code> façade composing them. The <code>redact_phone</code> public helper is included because exception messages already need it. The Rails-env guard from ADR-0002 is deferred to slice 05.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li><code>configure</code> yields a Config; <code>validate!</code> raises ConfigurationError when any required field is unset.</li>
+              <li><code>normalize_phone("(555) 555-1234", country: "US")</code> returns <code>"+15555551234"</code> and equivalents work for spaces, dashes, dots, raw E.164.</li>
+              <li><code>test_mode!</code> swaps the active OTP adapter to a TestAdapter instance.</li>
+              <li><code>send_code("+15555551234")</code> returns a Result with <code>success? == true</code>.</li>
+              <li><code>verify_code("+15555551234", "000000")</code> returns a Result with <code>success? == true</code> and a non-nil Token.</li>
+              <li><code>decode_token(result.token)</code> returns an Identity carrying the Phone and <code>expires_at == issued_at + session_duration</code> (default 86400).</li>
+              <li><code>redact_phone("+15555551234")</code> returns <code>"+1******1234"</code>.</li>
+              <li>Token carries documented claims (<code>sub</code>, <code>iat</code>, <code>exp</code>, <code>iss: "bitsmithy-auth"</code>), HS256, verifies <code>iss</code> on decode.</li>
+              <li>Each module built has at least one happy-path test.</li>
+              <li><code>bundle exec rake</code> green; Rubocop clean.</li>
+              <li><code>bin/console</code> smoke demo: four-line sequence walks the Verification dance.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== SLICE 2 ===== -->
+      <article class="slice slice--afk">
+        <div class="slice__num">02</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Failure-path coverage for the core pipeline</h3>
+            <span class="badge badge--afk">AFK</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--block">slice 01</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">02</span>
+                <span class="story-pin">04</span>
+                <span class="story-pin">05</span>
+                <span class="story-pin">11</span>
+                <span class="story-pin">12</span>
+                <span class="story-pin">18</span>
+                <span class="story-pin">20</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">Extend the same pipeline with the failure paths a Host app sees as Results or raises. <code>verify_code</code> returns a Result with <code>:invalid_code</code> when the wrong code is supplied. <code>send_code</code> returns a Result with <code>:invalid_phone_number</code> when normalisation fails. <code>decode_token</code> raises <code>InvalidToken</code> for tampered, expired, wrong-signing-key, and wrong-issuer Tokens. <code>Config.validate!</code> raises naming each missing required field. <code>Phone.normalize</code> raises <code>InvalidPhoneNumber</code> with the input redacted per ADR-0004.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li><code>verify_code(phone, "anything-but-000000")</code> → Result with <code>error == :invalid_code</code>.</li>
+              <li><code>send_code("not a phone")</code> → Result with <code>error == :invalid_phone_number</code> (does not raise).</li>
+              <li><code>decode_token("garbage")</code> raises <code>InvalidToken</code>.</li>
+              <li><code>decode_token</code> of token signed with the wrong key raises <code>InvalidToken</code>.</li>
+              <li><code>decode_token</code> of token with wrong <code>iss</code> raises <code>InvalidToken</code>.</li>
+              <li><code>decode_token</code> of expired token raises <code>InvalidToken</code>.</li>
+              <li><code>Config.validate!</code> raises naming the first missing field; passes when all required fields set.</li>
+              <li><code>InvalidPhoneNumber#message</code> includes the redacted form; raw Phone never appears via <code>to_s</code> or <code>inspect</code>.</li>
+              <li>Each failure path has a dedicated sentence-style Minitest test.</li>
+              <li><code>bundle exec rake</code> green.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== SLICE 3 ===== -->
+      <article class="slice slice--afk">
+        <div class="slice__num">03</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Twilio Verify as the production OTP backend</h3>
+            <span class="badge badge--afk">AFK</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--block">slice 01</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">10</span>
+                <span class="story-pin">14</span>
+                <span class="story-pin">31</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">A second OTP::Adapter implementation that wraps Twilio Verify. Configured by passing a TwilioAdapter instance into the Config; the same <code>send_code</code> / <code>verify_code</code> pipeline drives it. Adapter delegates to Twilio Verify's send and check endpoints via the <code>twilio-ruby</code> SDK. Failure modes map to the documented symbol vocabulary: <code>60200</code> → <code>:invalid_phone_number</code>, <code>60202</code> → <code>:max_check_attempts</code>, <code>60203</code> → <code>:max_send_attempts</code>, HTTP 401 → <code>:twilio_authentication_error</code>, 429 → <code>:twilio_rate_limited</code>, 5xx/timeout → <code>:twilio_service_unavailable</code>, fallback → <code>:twilio_error</code>. Tests use Mocha — no WebMock, no real HTTP.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li><code>twilio-ruby</code> in gemspec runtime deps; <code>mocha</code> in Gemfile dev deps.</li>
+              <li>With Config wired to a TwilioAdapter (Mocha-stubbed approval), <code>send_code</code> → success Result.</li>
+              <li>Same stubbing: <code>verify_code</code> → success Result with a Token decodable by <code>decode_token</code>.</li>
+              <li>Each of the seven Twilio failure cases maps to its specified error symbol — one test per mapping.</li>
+              <li>Unmapped Twilio codes fall through to <code>:twilio_error</code>.</li>
+              <li>Adapter never raises — every Twilio failure path produces a failure Result.</li>
+              <li><code>bundle exec rake</code> green.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== SLICE 4 ===== -->
+      <article class="slice slice--afk">
+        <div class="slice__num">04</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Rate-limit Verification sends per Phone</h3>
+            <span class="badge badge--afk">AFK</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--block">slice 01</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">13</span>
+                <span class="story-pin">16</span>
+                <span class="story-pin">22</span>
+                <span class="story-pin">23</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">A RateLimiter that consults a pluggable Store and raises internally when a Phone exceeds the threshold within the window. Default Store: <code>Stores::MemoryStore</code>, mutex-protected in-process counter with sliding-window expiry. The top-level <code>send_code</code> invokes the limiter before delegating to the OTP adapter, so Twilio is never billed for rate-limited attempts. Internal <code>RateLimited</code> raise is caught and converted into <code>Result.failure(:rate_limited)</code> at the top level — internal raise, external Result, consistent with the convention.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li>6th <code>send_code</code> to the same Phone within an hour → Result with <code>:rate_limited</code>; OTP adapter not consulted.</li>
+              <li>Two different Phones each get their own 5-per-hour bucket — no cross-Phone interference.</li>
+              <li>Stubbing <code>Time.now</code> forward past the window resets the counter; <code>send_code</code> succeeds again.</li>
+              <li>MemoryStore is mutex-protected — concurrent-burst threads test shows no miscounts.</li>
+              <li>Store interface documented as <code>#increment(key, window_seconds) → count</code>; any conforming object passable via <code>config.rate_limit_store</code>.</li>
+              <li><code>config.rate_limit</code> defaults to <code>{ per_phone: 5, window: 3600 }</code>; overrides honoured.</li>
+              <li><code>bundle exec rake</code> green.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== SLICE 5 ===== -->
+      <article class="slice slice--afk">
+        <div class="slice__num">05</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title"><code style="font-family: var(--font-mono); font-size: 0.85em;">test_mode!</code> Rails-environment safety guard</h3>
+            <span class="badge badge--afk">AFK</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--block">slice 01</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">26</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">Add the env guard from ADR-0002 around <code>test_mode!</code>. The method raises <code>ConfigurationError</code> unless Rails is loaded AND the current Rails env is <code>test</code> or <code>development</code>. In non-Rails contexts (no <code>Rails</code> constant defined), the method refuses outright. The guard's failure message states which environments allow Test mode and tells the developer how to swap the OTP adapter manually if they need Test mode outside Rails.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li>In a <code>Rails.env.test?</code> context, <code>test_mode!</code> succeeds (regression test for slice 01).</li>
+              <li>In a <code>Rails.env.development?</code> context, <code>test_mode!</code> succeeds.</li>
+              <li>In a <code>Rails.env.production?</code> (or other non-test/dev) context, <code>test_mode!</code> raises <code>ConfigurationError</code>.</li>
+              <li>When <code>Rails</code> is not defined (simulated by undefining the constant), <code>test_mode!</code> raises <code>ConfigurationError</code>.</li>
+              <li>Error message names the allowed environments.</li>
+              <li><code>bundle exec rake</code> green.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== SLICE 6 ===== -->
+      <article class="slice slice--afk">
+        <div class="slice__num">06</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Rails Controller concern</h3>
+            <span class="badge badge--afk">AFK</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--block">slice 01</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">06</span>
+                <span class="story-pin">07</span>
+                <span class="story-pin">32</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">A <code>Bitsmithy::Auth::Controller</code> concern that a Host-app <code>ApplicationController</code> mixes in. Reads and writes a Token in <code>session[:bitsmithy_auth_token]</code>. Exposes <code>current_identity</code>, <code>current_phone</code>, <code>authenticated?</code>, <code>sign_in</code>, <code>sign_out</code>. Memoised per request; memo invalidated on sign-in/sign-out. Loaded only when <code>ActionController</code> is defined at gem-load time. Deliberately omits <code>require_authentication!</code> — Host apps own redirect semantics. Tested via a minimal fake controller class exposing a <code>session</code> Hash; <code>actionpack</code> in Gemfile's <code>:test</code> group.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li><code>actionpack</code> in Gemfile <code>:test</code> group.</li>
+              <li>Concern file loaded only when <code>ActionController</code> is defined — confirmed by <code>defined?(Bitsmithy::Auth::Controller)</code> with/without ActionController.</li>
+              <li>Mixing into fake controller with valid Token in session: <code>current_phone</code> matches Token's <code>sub</code>.</li>
+              <li>Empty session: <code>current_phone == nil</code> and <code>authenticated? == false</code>.</li>
+              <li>Invalid Token in session: <code>current_phone == nil</code> (InvalidToken swallowed, not propagated).</li>
+              <li><code>sign_in(phone:, token:)</code> writes session key; subsequent <code>current_phone</code> returns new phone (memo invalidated).</li>
+              <li><code>sign_out</code> removes session key; subsequent <code>current_phone</code> returns nil.</li>
+              <li>No <code>require_authentication!</code> method defined on the concern.</li>
+              <li><code>bundle exec rake</code> green.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== SLICE 7 ===== -->
+      <article class="slice slice--hitl">
+        <div class="slice__num">07</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">README, CHANGELOG, and integration walkthrough</h3>
+            <span class="badge badge--hitl">HITL</span>
+          </div>
+          <div class="slice__meta">
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Blocked by</span>
+              <span class="slice__meta-value slice__meta-value--block">slices 01 · 02 · 03 · 04 · 05 · 06</span>
+            </div>
+            <div class="slice__meta-item">
+              <span class="slice__meta-label">Stories</span>
+              <span class="slice__stories">
+                <span class="story-pin">all</span>
+              </span>
+            </div>
+          </div>
+          <p class="slice__what">Rewrite the bundler-generated README into v0.1.0 usage documentation. CHANGELOG gets a release entry. README must walk a Host-app developer through: installation via the GitHub source, configuration block with sensible defaults, signing-key generation, three end-to-end examples (Rails sign-in controller / API bearer token / plain Ruby), Test mode usage, PII redaction guidance, a "what's deferred to v0.2.0" section, and pointers to <code>CONTEXT.md</code> and <code>docs/adr/</code>. HITL because prose needs editorial review — the AI drafts, the human shapes the voice.</p>
+          <div class="criteria">
+            <div class="criteria__head">Acceptance criteria</div>
+            <ul class="criteria__list">
+              <li>README renders correctly on GitHub — code blocks, no broken links, no leftover bundler placeholders.</li>
+              <li>All three usage examples are copy-paste runnable (Rails example reviewable in a Rails sandbox).</li>
+              <li>CHANGELOG entry uses project commit-style format and lists v0.1.0 features.</li>
+              <li>No mention of features that did not actually land in slices 01–06.</li>
+              <li>User reviews and approves the prose; revisions land in additional commits if needed.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ COVERAGE TABLE ============ -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Coverage cross-check</div>
+      <h2 class="section-title">Every <em>module</em> lands in a slice. Every public method gets a test.</h2>
+      <p class="section-lead">Cross-reference between the PRD's module sketch and the slice plan — no module is forgotten, every behaviour has a slice that owns its tests.</p>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>PRD module</th>
+              <th>Built in slice</th>
+              <th>Tested in slice</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-mono">Phone</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> happy · <span class="slice-chip">02</span> failure + redacted msg</td>
+            </tr>
+            <tr>
+              <td class="col-mono">Token</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> round-trip · <span class="slice-chip">02</span> decode failures</td>
+            </tr>
+            <tr>
+              <td class="col-mono">Result, Identity, errors</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> happy · <span class="slice-chip">02</span> failure surface</td>
+            </tr>
+            <tr>
+              <td class="col-mono">Config</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> defaults · <span class="slice-chip">02</span> validate! per field</td>
+            </tr>
+            <tr>
+              <td class="col-mono">OTP::TestAdapter</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> happy · <span class="slice-chip">02</span> wrong-code failure</td>
+            </tr>
+            <tr>
+              <td class="col-mono">OTP::TwilioAdapter</td>
+              <td><span class="slice-chip">03</span></td>
+              <td><span class="slice-chip">03</span> success + 7 failure mappings</td>
+            </tr>
+            <tr>
+              <td class="col-mono">RateLimiter</td>
+              <td><span class="slice-chip">04</span></td>
+              <td><span class="slice-chip">04</span> boundary · isolation · window reset</td>
+            </tr>
+            <tr>
+              <td class="col-mono">Stores::MemoryStore</td>
+              <td><span class="slice-chip">04</span></td>
+              <td><span class="slice-chip">04</span> counts · expiry · reset · concurrent burst</td>
+            </tr>
+            <tr>
+              <td class="col-mono">Bitsmithy::Auth (façade)</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> happy wiring · <span class="slice-chip">02</span> failure conversion · <span class="slice-chip">04</span> rate-limit conversion</td>
+            </tr>
+            <tr>
+              <td class="col-mono">redact_phone helper</td>
+              <td><span class="slice-chip">01</span></td>
+              <td><span class="slice-chip">01</span> format · <span class="slice-chip">02</span> exception integration</td>
+            </tr>
+            <tr>
+              <td class="col-mono">test_mode! env guard</td>
+              <td><span class="slice-chip">05</span></td>
+              <td><span class="slice-chip">05</span> all four env cases</td>
+            </tr>
+            <tr>
+              <td class="col-mono">Bitsmithy::Auth::Controller</td>
+              <td><span class="slice-chip">06</span></td>
+              <td><span class="slice-chip">06</span> session round-trip · memoisation · conditional load</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div>
+      <strong>Tasks · /build phase 3</strong>
+      <div>bitsmithy-auth v0.1.0 — initial implementation</div>
+      <div style="margin-top: 6px; color: var(--text-bright);">docs/claude/20260526-1948-initial-implementation/tasks.md</div>
+    </div>
+    <div style="text-align: right;">
+      <strong>Next step</strong>
+      <div><code style="font-family: var(--font-mono); background: var(--surface-recessed); padding: 1px 6px; color: var(--text-bright);">/implement-coach</code> · user writes code, AI writes one test at a time</div>
+      <div style="margin-top: 6px;">Awaiting approval — say "approve" or push back on granularity / dependencies / coverage</div>
+    </div>
+  </footer>
+
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    securityLevel: 'loose',
+    themeVariables: {
+      fontFamily: 'IBM Plex Mono, SF Mono, monospace',
+      fontSize: '17px',
+      primaryColor: isDark ? '#2a1f12' : '#fbe9c1',
+      primaryBorderColor: isDark ? '#e6a23c' : '#b58218',
+      primaryTextColor: isDark ? '#f0e8d8' : '#2a2018',
+      secondaryColor: isDark ? '#1c2415' : '#eaf3da',
+      secondaryBorderColor: isDark ? '#92c065' : '#4d7c0f',
+      secondaryTextColor: isDark ? '#f0e8d8' : '#2a2018',
+      tertiaryColor: isDark ? '#241612' : '#fbe1d2',
+      tertiaryBorderColor: isDark ? '#e07a4a' : '#c2410c',
+      tertiaryTextColor: isDark ? '#f0e8d8' : '#2a2018',
+      lineColor: isDark ? '#a8997f' : '#6b5a44',
+    }
+  });
+</script>
+
+<script>
+  function fitMermaidDiagrams() {
+    document.querySelectorAll('.mermaid-wrap').forEach(function(wrap) {
+      var mEl = wrap.querySelector('.mermaid');
+      var svg = mEl && mEl.querySelector('svg');
+      if (!svg) return;
+
+      mEl.style.zoom = 1;
+      var pad = 64;
+      var svgW = svg.getBoundingClientRect().width;
+      var svgH = svg.getBoundingClientRect().height;
+      var wrapW = wrap.clientWidth - pad;
+      var wrapH = wrap.clientHeight - pad;
+      var zoom = Math.min(wrapW / svgW, wrapH / svgH);
+      zoom = Math.max(zoom, 1.3);
+
+      mEl.style.zoom = zoom;
+      mEl.dataset.zoom = zoom;
+      mEl.dataset.fitZoom = zoom;
+    });
+  }
+
+  var observer = new MutationObserver(function(mutations, obs) {
+    var hasSvg = document.querySelector('.mermaid svg');
+    if (hasSvg) {
+      obs.disconnect();
+      setTimeout(fitMermaidDiagrams, 100);
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  function zoomDiagram(btn, factor) {
+    var wrap = btn.closest('.mermaid-wrap');
+    var target = wrap.querySelector('.mermaid');
+    var current = parseFloat(target.dataset.zoom || 1);
+    var next = Math.min(Math.max(current * factor, 0.5), 8);
+    target.dataset.zoom = next;
+    target.style.zoom = next;
+  }
+
+  function resetZoom(btn) {
+    var wrap = btn.closest('.mermaid-wrap');
+    var target = wrap.querySelector('.mermaid');
+    var fitZoom = parseFloat(target.dataset.fitZoom || 1);
+    target.dataset.zoom = fitZoom;
+    target.style.zoom = fitZoom;
+  }
+
+  document.querySelectorAll('.mermaid-wrap').forEach(function(wrap) {
+    wrap.addEventListener('wheel', function(e) {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      var target = wrap.querySelector('.mermaid');
+      var current = parseFloat(target.dataset.zoom || 1);
+      var factor = e.deltaY < 0 ? 1.1 : 0.9;
+      var next = Math.min(Math.max(current * factor, 0.5), 8);
+      target.dataset.zoom = next;
+      target.style.zoom = next;
+    }, { passive: false });
+
+    var startX, startY, scrollL, scrollT;
+    wrap.addEventListener('mousedown', function(e) {
+      if (e.target.closest('.zoom-controls')) return;
+      wrap.classList.add('is-panning');
+      startX = e.clientX;
+      startY = e.clientY;
+      scrollL = wrap.scrollLeft;
+      scrollT = wrap.scrollTop;
+    });
+    window.addEventListener('mousemove', function(e) {
+      if (!wrap.classList.contains('is-panning')) return;
+      wrap.scrollLeft = scrollL - (e.clientX - startX);
+      wrap.scrollTop = scrollT - (e.clientY - startY);
+    });
+    window.addEventListener('mouseup', function() {
+      wrap.classList.remove('is-panning');
+    });
+  });
+</script>
+
+</body>
+</html>
