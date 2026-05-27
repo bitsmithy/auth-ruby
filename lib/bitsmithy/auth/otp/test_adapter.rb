@@ -13,10 +13,12 @@ module Bitsmithy
         end
 
         def verify_code(phone, code)
-          return unless code == "000000"
-
-          Token.encode(phone: phone, config: @config).then do |token|
-            Result.success(token: token, phone: phone)
+          if code == "000000"
+            Token.encode(phone: phone, config: @config).then do |token|
+              Result.success(token: token, phone: phone)
+            end
+          else
+            Result.failure(error: :invalid_code, phone: phone)
           end
         end
       end

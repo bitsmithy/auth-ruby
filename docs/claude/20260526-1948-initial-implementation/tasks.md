@@ -43,6 +43,7 @@ This slice deliberately ships the simplest viable `test_mode!` (just swaps the O
 
 ## Slice 2: Failure-path coverage for the core pipeline
 
+**Status:** ✅ Complete
 **Type:** AFK
 **Blocked by:** Slice 1
 **User stories covered:** 2, 4, 5, 11, 12, 18, 20
@@ -53,16 +54,16 @@ Extend the same end-to-end pipeline from slice 1 with the failure paths a Host a
 
 ### Acceptance criteria
 
-- [ ] `verify_code(phone, "anything-but-000000")` returns a Result with `success? == false` and `error == :invalid_code`.
-- [ ] `send_code("not a phone")` returns a Result with `error == :invalid_phone_number` (does not raise).
-- [ ] `decode_token("garbage")` raises `InvalidToken`.
-- [ ] `decode_token(token_signed_with_other_key)` raises `InvalidToken`.
-- [ ] `decode_token(token_with_iss_other)` raises `InvalidToken`.
-- [ ] `decode_token(expired_token)` raises `InvalidToken`.
-- [ ] `Config.validate!` raises `ConfigurationError` naming the first missing field; passes when all required fields are set.
-- [ ] `InvalidPhoneNumber#message` includes the redacted form of the input, never the raw input. The error message survives round-trip through a `to_s` and an `inspect` call without revealing the Phone.
-- [ ] Each failure path has a dedicated Minitest test with a sentence-style name.
-- [ ] `bundle exec rake` passes.
+- [x] `verify_code(phone, "anything-but-000000")` returns a Result with `success? == false` and `error == :invalid_code`.
+- [x] `send_code("not a phone")` returns a Result with `error == :invalid_phone_number` (does not raise).
+- [x] `decode_token("garbage")` raises `InvalidToken`.
+- [x] `decode_token(token_signed_with_other_key)` raises `InvalidToken`.
+- [x] `decode_token(token_with_iss_other)` raises `InvalidToken`.
+- [x] `decode_token(expired_token)` raises `InvalidToken`.
+- [x] `Config.validate!` raises `ConfigurationError` naming the first missing field; passes when all required fields are set.
+- [x] `InvalidPhoneNumber#message` **includes the raw input** for debuggability. *(ADR-0004 revised: failed-parse inputs are not redacted — only successfully-parsed Phones in other exceptions get redacted. Two redact-in-error-message tests dropped.)*
+- [x] Each failure path has a dedicated Minitest test with a sentence-style name.
+- [x] `bundle exec rake` passes.
 
 ---
 

@@ -24,7 +24,9 @@ module Bitsmithy
       end
 
       def send_code(phone)
-        config.otp_adapter.send_code(phone)
+        config.otp_adapter.send_code(normalize_phone(phone))
+      rescue InvalidPhoneNumber
+        Result.failure(error: :invalid_phone_number, phone: phone)
       end
 
       def verify_code(phone, code)
