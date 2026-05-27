@@ -102,6 +102,7 @@ Tests use Mocha to stub the Twilio client chain — no WebMock, no real HTTP cal
 
 ## Slice 4: Rate-limit Verification sends per Phone
 
+**Status:** ✅ Complete
 **Type:** AFK
 **Blocked by:** Slice 1
 **User stories covered:** 13, 16, 22, 23
@@ -114,13 +115,13 @@ Defaults are 5 sends per Phone per hour. Overridable via `config.rate_limit = { 
 
 ### Acceptance criteria
 
-- [ ] The 6th `send_code` call to the same Phone within an hour returns a Result with `error == :rate_limited`; the OTP adapter is not consulted.
-- [ ] Two different Phones each get their own 5-per-hour bucket — no cross-Phone interference.
-- [ ] When the window expires (verified by stubbing `Time.now` forward), the counter resets and `send_code` succeeds again.
-- [ ] The MemoryStore is mutex-protected — a concurrent-burst test using threads shows no count miscounts.
-- [ ] The Store interface is documented as `#increment(key, window_seconds) → count`; any object implementing it can be passed as `config.rate_limit_store`.
-- [ ] `config.rate_limit` defaults to `{ per_phone: 5, window: 3600 }` and is honoured when overridden.
-- [ ] `bundle exec rake` passes.
+- [x] The 6th `send_code` call to the same Phone within an hour returns a Result with `error == :rate_limited`; the OTP adapter is not consulted.
+- [x] Two different Phones each get their own 5-per-hour bucket — no cross-Phone interference.
+- [x] When the window expires (verified by stubbing `Time.now` forward), the counter resets and `send_code` succeeds again.
+- [x] The MemoryStore is mutex-protected — a concurrent-burst test using threads shows no count miscounts.
+- [x] The Store interface is documented as `#increment(key, window_seconds) → count`; any object implementing it can be passed as `config.rate_limit_store`.
+- [x] `config.rate_limit` defaults to `{ per_phone: 5, window: 3600 }` and is honoured when overridden.
+- [x] `bundle exec rake` passes.
 
 ---
 

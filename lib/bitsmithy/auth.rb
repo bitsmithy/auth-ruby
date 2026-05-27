@@ -7,8 +7,10 @@ require_relative "auth/result"
 require_relative "auth/token"
 require_relative "auth/identity"
 require_relative "auth/phone"
+require_relative "auth/rate_limiter"
 require_relative "auth/otp/test_adapter"
 require_relative "auth/otp/twilio_adapter"
+require_relative "auth/stores/memory_store"
 
 module Bitsmithy
   module Auth
@@ -25,7 +27,11 @@ module Bitsmithy
       end
 
       def send_code(phone)
-        config.otp_adapter.send_code(normalize_phone(phone))
+        normalized = normalize_phone(phone)
+        rate_limiter.check!("send_code:#{normalized}")
+        config.otp_adapter.send_code(normalized)
+      rescue RateLimited
+        Result.failure(error: :rate_limited, phone: phone)
       rescue InvalidPhoneNumber
         Result.failure(error: :invalid_phone_number, phone: phone)
       end
@@ -59,6 +65,17 @@ module Bitsmithy
 
       def reset_config!
         @config = nil
+        @rate_limiter = nil
+      end
+
+      private
+
+      def rate_limiter
+        @rate_limiter ||= RateLimiter.new(
+          store: config.rate_limit_store ||= Stores::MemoryStore.new,
+          max_attempts: config.rate_limit[:per_phone],
+          window: config.rate_limit[:window]
+        )
       end
     end
   end
