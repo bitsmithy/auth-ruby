@@ -5,4 +5,5 @@ require "bitsmithy/auth"
 
 require "minitest/autorun"
 require "mocha/minitest"
+require_relative "support/rails_env_stub"
 require_relative "support/config_helper"

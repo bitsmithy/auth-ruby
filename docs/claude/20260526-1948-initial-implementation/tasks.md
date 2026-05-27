@@ -126,6 +126,7 @@ Defaults are 5 sends per Phone per hour. Overridable via `config.rate_limit = { 
 
 ## Slice 5: `test_mode!` Rails-environment safety guard
 
+**Status:** ✅ Complete
 **Type:** AFK
 **Blocked by:** Slice 1
 **User stories covered:** 26
@@ -136,12 +137,12 @@ Add the env guard from ADR-0002 around `Bitsmithy::Auth.test_mode!`. The method 
 
 ### Acceptance criteria
 
-- [ ] In a `Rails.env.test?` context, `test_mode!` succeeds and swaps the OTP adapter (regression test for slice 1's behaviour, now passing through the guard).
-- [ ] In a `Rails.env.development?` context, `test_mode!` succeeds.
-- [ ] In a `Rails.env.production?` context (or any other non-test/dev Rails env), `test_mode!` raises `ConfigurationError`.
-- [ ] When `Rails` is not defined (simulated by undefining the constant during the test), `test_mode!` raises `ConfigurationError`.
-- [ ] The guard's error message names the allowed environments.
-- [ ] `bundle exec rake` passes.
+- [x] In a `Rails.env.test?` context, `test_mode!` succeeds and swaps the OTP adapter (regression covered by ConfigHelper-driven default in every other test).
+- [x] In a `Rails.env.development?` context, `test_mode!` succeeds.
+- [x] In a `Rails.env.production?` context (or any other non-test/dev Rails env), `test_mode!` raises `ConfigurationError`.
+- [x] When `Rails` is not defined (simulated by `Object.send(:remove_const, :Rails)`), `test_mode!` raises `ConfigurationError`.
+- [x] The guard's error message names the allowed environments.
+- [x] `bundle exec rake` passes.
 
 ---
 
