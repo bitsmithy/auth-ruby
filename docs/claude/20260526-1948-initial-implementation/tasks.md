@@ -69,6 +69,7 @@ Extend the same end-to-end pipeline from slice 1 with the failure paths a Host a
 
 ## Slice 3: Twilio Verify as the production OTP backend
 
+**Status:** ✅ Complete
 **Type:** AFK
 **Blocked by:** Slice 1
 **User stories covered:** 10, 14 (Twilio portion), 31
@@ -89,13 +90,13 @@ Tests use Mocha to stub the Twilio client chain — no WebMock, no real HTTP cal
 
 ### Acceptance criteria
 
-- [ ] `twilio-ruby` enters the gemspec as a runtime dependency; `mocha` enters the Gemfile as a dev dependency.
-- [ ] With Config wired to a TwilioAdapter (and the Twilio client chain Mocha-stubbed to return an approved verification), `send_code` returns a success Result.
-- [ ] With the same stubbing, `verify_code` returns a success Result containing a valid Token decodable by `decode_token`.
-- [ ] Each of the seven Twilio failure cases above maps to its specified Result error symbol — one test per mapping.
-- [ ] Unmapped Twilio error codes fall through to `:twilio_error`.
-- [ ] The adapter never raises — every Twilio failure path produces a failure Result.
-- [ ] `bundle exec rake` passes.
+- [x] `twilio-ruby` enters the gemspec as a runtime dependency; `mocha` enters the Gemfile as a dev dependency.
+- [x] With Config wired to a TwilioAdapter (and the Twilio client chain Mocha-stubbed to return an approved verification), `send_code` returns a success Result.
+- [x] With the same stubbing, `verify_code` returns a success Result containing a valid Token decodable by `decode_token`.
+- [x] Each of the seven Twilio failure cases above maps to its specified Result error symbol — one test per mapping.
+- [x] Unmapped Twilio error codes fall through to `:twilio_error`.
+- [x] The adapter never raises — every Twilio failure path produces a failure Result.
+- [x] `bundle exec rake` passes.
 
 ---
 
