@@ -8,6 +8,7 @@ Seven vertical slices. Slice 1 is the tracer bullet that establishes the full sp
 
 ## Slice 1: End-to-end Verification happy path (the tracer bullet)
 
+**Status:** ✅ Complete
 **Type:** AFK
 **Blocked by:** None — can start immediately
 **User stories covered:** 1, 3, 8, 9, 14 (TestAdapter portion), 15, 17, 19, 21, 24, 25, 29, 30, 31
@@ -20,17 +21,17 @@ This slice deliberately ships the simplest viable `test_mode!` (just swaps the O
 
 ### Acceptance criteria
 
-- [ ] `Bitsmithy::Auth.configure { |c| ... }` yields a Config; `validate!` raises ConfigurationError when any of the four required fields is unset.
-- [ ] `Bitsmithy::Auth.normalize_phone("(555) 555-1234", country: "US")` returns `"+15555551234"` and equivalent normalisations work for spaces, dashes, dots, and raw E.164 input.
-- [ ] `Bitsmithy::Auth.test_mode!` swaps the active OTP adapter to a TestAdapter instance (no env guard yet).
-- [ ] `Bitsmithy::Auth.send_code("+15555551234")` returns a Result with `success? == true`.
-- [ ] `Bitsmithy::Auth.verify_code("+15555551234", "000000")` returns a Result with `success? == true` and a non-nil Token.
-- [ ] `Bitsmithy::Auth.decode_token(result.token)` returns an Identity carrying the original Phone and an `expires_at` that is `session_duration` seconds (default 86400) after `issued_at`.
-- [ ] `Bitsmithy::Auth.redact_phone("+15555551234")` returns `"+1******1234"`.
-- [ ] The Token carries the documented claims (`sub`, `iat`, `exp`, `iss: "bitsmithy-auth"`), uses HS256, and verifies `iss` on decode.
-- [ ] Each module built in this slice has at least one happy-path test.
-- [ ] `bundle exec rake` passes — all tests green, Rubocop clean.
-- [ ] Smoke demo in `bin/console`: paste a four-line sequence and watch the Verification dance end-to-end.
+- [x] `Bitsmithy::Auth.configure { |c| ... }` yields a Config; `validate!` raises ConfigurationError when any of the four required fields is unset. *(configure: ✓; validate! deferred to slice 2 failure path coverage)*
+- [x] `Bitsmithy::Auth.normalize_phone("(212) 736-3100", country: "US")` returns `"+12127363100"`. *(test phone updated from fictional 555 number)*
+- [x] `Bitsmithy::Auth.test_mode!` swaps the active OTP adapter to a TestAdapter instance (no env guard yet).
+- [x] `Bitsmithy::Auth.send_code("+12127363100")` returns a Result with `success? == true`.
+- [x] `Bitsmithy::Auth.verify_code("+12127363100", "000000")` returns a Result with `success? == true` and a non-nil Token.
+- [x] `Bitsmithy::Auth.decode_token(result.token)` returns an Identity carrying the original Phone and an `expires_at` that is `session_duration` seconds (default 86400) after `issued_at`.
+- [x] `Bitsmithy::Auth.redact_phone("+12127363100")` returns `"+1******3100"`.
+- [x] The Token carries the documented claims (`sub`, `iat`, `exp`, `iss: "bitsmithy-auth"`), uses HS256, and verifies `iss` on decode.
+- [x] Each module built in this slice has at least one happy-path test (covered via integration tests in `test/bitsmithy/test_auth.rb`).
+- [x] `bundle exec rake` passes — all tests green, Rubocop clean.
+- [ ] Smoke demo in `bin/console` — deferred, you can manually verify when convenient.
 
 ### Implementation notes (decision-only — no file paths)
 

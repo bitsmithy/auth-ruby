@@ -2,11 +2,14 @@ PATH
   remote: .
   specs:
     bitsmithy-auth (0.1.0)
+      jwt (~> 3.2)
+      phonelib (~> 0.10)
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
+    base64 (0.3.0)
     date (3.5.1)
     erb (6.0.4)
     io-console (0.8.2)
@@ -16,6 +19,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.19.5)
+    jwt (3.2.0)
+      base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     minitest (5.27.0)
@@ -23,6 +28,7 @@ GEM
     parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
+    phonelib (0.10.20)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -83,6 +89,7 @@ DEPENDENCIES
 
 CHECKSUMS
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
+  base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   bitsmithy-auth (0.1.0)
   bundler (4.0.12) sha256=7f8b757d28dfb636e7b24fba2344ac6dd13b5b24f4b46d62573d483f211825ac
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
@@ -90,11 +97,13 @@ CHECKSUMS
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.19.5) sha256=218a18553e4801d579ca7e0f5bc72bafd776d7397238a1fb4e74db5b0a812c59
+  jwt (3.2.0) sha256=5419b1fe37b1da0982bd07051f573a8b8789ab724c2aa7e785e4784a3ed217d7
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   minitest (5.27.0) sha256=2d3b17f8a36fe7801c1adcffdbc38233b938eb0b4966e97a6739055a45fa77d5
   parallel (2.1.0) sha256=b35258865c2e31134c5ecb708beaaf6772adf9d5efae28e93e99260877b09356
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
+  phonelib (0.10.20) sha256=15af54cddbec5a73ee2ca466f9ccc2dd849f58d1c434c718df096601f8c6dbfe
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
