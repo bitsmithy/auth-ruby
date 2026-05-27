@@ -8,6 +8,7 @@ require_relative "auth/token"
 require_relative "auth/identity"
 require_relative "auth/phone"
 require_relative "auth/otp/test_adapter"
+require_relative "auth/otp/twilio_adapter"
 
 module Bitsmithy
   module Auth
