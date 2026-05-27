@@ -1,21 +1,17 @@
 # frozen_string_literal: true
 
 require_relative "auth/version"
-require_relative "auth/config"
 require_relative "auth/errors"
+require_relative "auth/config"
 require_relative "auth/result"
 require_relative "auth/token"
-require_relative "auth/identity"
 require_relative "auth/phone"
 require_relative "auth/rate_limiter"
-require_relative "auth/otp/test_adapter"
-require_relative "auth/otp/twilio_adapter"
 require_relative "auth/stores/memory_store"
+require_relative "auth/otp/test_adapter"
 
 module Bitsmithy
   module Auth
-    class Error < StandardError; end
-
     class << self
       def config
         @config ||= Config.new

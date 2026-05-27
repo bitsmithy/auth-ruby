@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "phonelib"
+require_relative "errors"
 
 module Bitsmithy
   module Auth

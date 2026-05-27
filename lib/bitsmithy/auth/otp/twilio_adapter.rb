@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "twilio-ruby"
+require_relative "../result"
+require_relative "../token"
 
 module Bitsmithy
   module Auth

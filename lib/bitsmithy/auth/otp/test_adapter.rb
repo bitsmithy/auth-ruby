@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative "../result"
+require_relative "../token"
+
 module Bitsmithy
   module Auth
     module OTP
