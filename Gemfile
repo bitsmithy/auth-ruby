@@ -14,3 +14,7 @@ gem "mocha", "~> 2.0"
 gem "rubocop", "~> 1.21"
 gem "rubocop-minitest", require: false
 gem "rubocop-rake", require: false
+
+group :test do
+  gem "actionpack", "~> 8.0"
+end

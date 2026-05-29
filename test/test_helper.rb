@@ -2,6 +2,10 @@
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
+# Load ActionController BEFORE the gem so the conditional require for
+# Bitsmithy::Auth::Controller fires inside lib/bitsmithy/auth.rb.
+require "action_controller"
+
 # Load every gem source file so test files don't need to track their own
 # per-test requires. Each lib file declares its own require_relative chain;
 # this just ensures none are missed under the bitsmithy-auth tree.
