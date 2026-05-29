@@ -50,7 +50,7 @@ This slice deliberately ships the simplest viable `test_mode!` (just swaps the O
 
 ### What to build
 
-Extend the same end-to-end pipeline from slice 1 with the failure paths a Host app sees as Results or raises. `verify_code` returns a Result with `:invalid_code` when the wrong code is supplied. `send_code` returns a Result with `:invalid_phone_number` when normalisation fails. `decode_token` raises `InvalidToken` for tampered, expired, wrong-signing-key, and wrong-issuer Tokens. `Config.validate!` raises `ConfigurationError` naming each missing required field. `Phone.normalize` raises `InvalidPhoneNumber` with the input redacted per ADR-0004.
+Extend the same end-to-end pipeline from slice 1 with the failure paths a Host app sees as Results or raises. `verify_code` returns a Result with `:invalid_code` when the wrong code is supplied. `send_code` returns a Result with `:invalid_phone_number` when normalisation fails. `decode_token` raises `InvalidToken` for tampered, expired, wrong-signing-key, and wrong-issuer Tokens. `Config.validate!` raises `ConfigurationError` naming each missing required field. `Phone.normalized` raises `InvalidPhoneNumber` with the raw input retained for debuggability per ADR-0004's revised position.
 
 ### Acceptance criteria
 
@@ -161,7 +161,7 @@ A `Bitsmithy::Auth::Controller` concern that a Host-app `ApplicationController` 
 - `current_identity` — decodes the Token from session, returns an Identity, or `nil` if absent or invalid. Memoised per request.
 - `current_phone` — convenience accessor that returns `current_identity&.phone`.
 - `authenticated?` — boolean predicate.
-- `sign_in(phone:, token:)` — writes the Token to session and invalidates the memoised identity.
+- `sign_in(token:)` — writes the Token to session and invalidates the memoised identity. *(`phone:` deliberately dropped — the Token's `sub` claim already carries the Phone.)*
 - `sign_out` — clears the session key and invalidates the memo.
 
 The concern is loaded only when `ActionController` is defined at gem-load time — non-Rails Host apps incur no Rails-related require cost. Deliberately omits `require_authentication!` — Host apps own redirect semantics (negative requirement from the PRD).
@@ -219,15 +219,31 @@ Rewrite the bundler-generated README into v0.1.0 usage documentation. CHANGELOG 
 
 | PRD module | Built in slice | Tested in slice |
 |---|---|---|
-| Phone | 1 | 1 (happy), 2 (failure + redacted message) |
-| Token | 1 | 1 (round-trip), 2 (decode failure modes) |
+| Phone | 1 | 1 (happy), 2 (failure raises raw input per ADR-0004) |
+| Token | 1 | 1 (round-trip), 2 (decode failure modes — extracted to test_token_decoding.rb in cleanup) |
 | Result, Identity, errors | 1 | 1 (happy), 2 (failure surface) |
 | Config | 1 | 1 (defaults), 2 (validate! per field) |
 | OTP::TestAdapter | 1 | 1 (happy), 2 (wrong-code failure) |
 | OTP::TwilioAdapter | 3 | 3 (success + 7 failure mappings) |
 | RateLimiter | 4 | 4 (boundary, isolation, window reset) |
-| Stores::MemoryStore | 4 | 4 (counts, expiry, reset, concurrent burst) |
+| Stores::MemoryStore | 4 | 4 (counts via increment, window expiry, mutex-protected concurrent burst) |
 | Bitsmithy::Auth (façade) | 1 | 1 (happy wiring), 2 (failure conversion), 4 (rate-limit conversion) |
-| `redact_phone` helper | 1 | 1 (format), 2 (exception messages use it) |
+| `redact_phone` helper | 1 | 1 (format); not used in exception messages — see ADR-0004 |
 | `test_mode!` env guard | 5 | 5 (all four env cases) |
 | Bitsmithy::Auth::Controller | 6 | 6 (session round-trip, memoisation, conditional load) |
+
+---
+
+## Verification Summary
+
+This tasks file was fact-checked against the v0.1.0 implementation on branch `hh/initial-implementation`.
+
+**Claims confirmed:** All seven slices marked complete have matching commits; acceptance criteria align with shipped behaviour; ADR references resolve to existing files; test file paths exist.
+
+**Corrections made:**
+
+- **Slice 2 "What to build"** — said `Phone.normalize raises InvalidPhoneNumber with the input redacted per ADR-0004`. ADR-0004 was revised in slice 2 itself to keep the raw input. Updated to `Phone.normalized raises InvalidPhoneNumber with the raw input retained for debuggability per ADR-0004's revised position` (also corrected the method name to `normalized`).
+- **Slice 6 "What to build"** — listed `sign_in(phone:, token:)`. Shipped as `sign_in(token:)`. Updated with rationale note.
+- **Coverage cross-check table** — Phone row claimed "redacted message" coverage; corrected to "failure raises raw input per ADR-0004". MemoryStore row claimed "reset" coverage; the `reset!` method was not implemented (YAGNI — see slice 4 discussion). Replaced with the actual covered behaviours.
+
+**Unverifiable claims:** none — every claim either confirmed or corrected against the codebase.

@@ -1022,7 +1022,7 @@ flowchart TD
               <li>Mixing into fake controller with valid Token in session: <code>current_phone</code> matches Token's <code>sub</code>.</li>
               <li>Empty session: <code>current_phone == nil</code> and <code>authenticated? == false</code>.</li>
               <li>Invalid Token in session: <code>current_phone == nil</code> (InvalidToken swallowed, not propagated).</li>
-              <li><code>sign_in(phone:, token:)</code> writes session key; subsequent <code>current_phone</code> returns new phone (memo invalidated).</li>
+              <li><code>sign_in(token:)</code> writes session key; subsequent <code>current_phone</code> returns new phone (memo invalidated). <em style="color: var(--text-dim); font-family: var(--font-display);">phone: param dropped — Token's sub claim already carries it.</em></li>
               <li><code>sign_out</code> removes session key; subsequent <code>current_phone</code> returns nil.</li>
               <li>No <code>require_authentication!</code> method defined on the concern.</li>
               <li><code>bundle exec rake</code> green.</li>
@@ -1150,6 +1150,61 @@ flowchart TD
           </tbody>
         </table>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ VERIFICATION SUMMARY ============ -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Verification</div>
+      <h2 class="section-title">Fact-checked against <em>shipped code</em>.</h2>
+      <p class="section-lead">Tasks file re-verified against the v0.1.0 branch after the post-completion review pass.</p>
+    </div>
+
+    <div class="slices">
+      <article class="slice slice--afk">
+        <div class="slice__num" style="color: var(--sage);">✓</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">All slice statuses align with shipped commits</h3>
+            <span class="badge badge--afk">CONFIRMED</span>
+          </div>
+          <p class="slice__what">Each slice marked complete has a matching commit on <code>hh/initial-implementation</code>. ADR references resolve. Acceptance criteria align with shipped behaviour. Test file paths exist.</p>
+        </div>
+      </article>
+
+      <article class="slice slice--hitl">
+        <div class="slice__num" style="color: var(--amber);">!</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Slice 2 — ADR-0004 reference corrected</h3>
+            <span class="badge" style="background: var(--amber); color: var(--bg);">CORRECTED</span>
+          </div>
+          <p class="slice__what">"What to build" claimed <code>Phone.normalize raises with the input redacted per ADR-0004</code>. ADR-0004 was revised in slice 2 itself — failed-parse inputs keep raw form for debuggability. Updated to <code>Phone.normalized raises with the raw input retained per ADR-0004's revised position</code>. Method name also corrected to <code>normalized</code>.</p>
+        </div>
+      </article>
+
+      <article class="slice slice--hitl">
+        <div class="slice__num" style="color: var(--amber);">!</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Slice 6 — sign_in signature corrected</h3>
+            <span class="badge" style="background: var(--amber); color: var(--bg);">CORRECTED</span>
+          </div>
+          <p class="slice__what">"What to build" listed <code>sign_in(phone:, token:)</code>. Shipped as <code>sign_in(token:)</code> — the Token's <code>sub</code> claim already carries the Phone, so the <code>phone:</code> param was YAGNI. Updated with the rationale.</p>
+        </div>
+      </article>
+
+      <article class="slice slice--hitl">
+        <div class="slice__num" style="color: var(--amber);">!</div>
+        <div class="slice__body">
+          <div class="slice__head">
+            <h3 class="slice__title">Coverage cross-check table — two cells corrected</h3>
+            <span class="badge" style="background: var(--amber); color: var(--bg);">CORRECTED</span>
+          </div>
+          <p class="slice__what">Phone row referenced "redacted message" coverage (ADR-0004 says raw). MemoryStore row referenced "reset" coverage (the <code>reset!</code> method was deliberately not implemented — YAGNI). Both replaced with the actual covered behaviours.</p>
+        </div>
+      </article>
     </div>
   </section>
 
