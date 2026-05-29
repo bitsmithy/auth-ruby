@@ -8,8 +8,6 @@
 # remove the Rails constant and restore it in an `ensure` block.
 
 class RailsEnvStub
-  attr_reader :name
-
   def initialize(name)
     @name = name.to_s
   end
@@ -20,10 +18,6 @@ class RailsEnvStub
 
   def development?
     @name == "development"
-  end
-
-  def production?
-    @name == "production"
   end
 end
 

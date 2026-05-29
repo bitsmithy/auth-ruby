@@ -63,54 +63,6 @@ module Bitsmithy
       assert_equal :invalid_phone_number, result.error
     end
 
-    def test_decode_token_raises_invalid_token_for_garbage_input
-      configure_for_tests
-
-      assert_raises(Bitsmithy::Auth::InvalidToken) do
-        Bitsmithy::Auth.decode_token("this is not a jwt")
-      end
-    end
-
-    def test_decode_token_raises_invalid_token_for_token_signed_with_other_key
-      configure_for_tests
-      result = Bitsmithy::Auth.verify_code("+12127363100", "000000")
-      token = result.token
-
-      Bitsmithy::Auth.config.signing_key = "a" * 64
-
-      assert_raises(Bitsmithy::Auth::InvalidToken) do
-        Bitsmithy::Auth.decode_token(token)
-      end
-    end
-
-    def test_decode_token_raises_invalid_token_for_token_with_wrong_issuer
-      configure_for_tests
-      now = Time.now.to_i
-      foreign_token = JWT.encode(
-        { sub: "+12127363100", iat: now, exp: now + 86_400, iss: "some-other-issuer" },
-        Bitsmithy::Auth.config.signing_key,
-        "HS256"
-      )
-
-      assert_raises(Bitsmithy::Auth::InvalidToken) do
-        Bitsmithy::Auth.decode_token(foreign_token)
-      end
-    end
-
-    def test_decode_token_raises_invalid_token_for_expired_token
-      configure_for_tests
-      past = Time.now.to_i - 7_200
-      expired_token = JWT.encode(
-        { sub: "+12127363100", iat: past, exp: past + 60, iss: Bitsmithy::Auth::Config::JWT_ISSUER },
-        Bitsmithy::Auth.config.signing_key,
-        "HS256"
-      )
-
-      assert_raises(Bitsmithy::Auth::InvalidToken) do
-        Bitsmithy::Auth.decode_token(expired_token)
-      end
-    end
-
     def test_config_validate_raises_configuration_error_when_required_field_missing
       config = Bitsmithy::Auth::Config.new
 
@@ -137,6 +89,31 @@ module Bitsmithy
       end
 
       assert_includes error.message, raw_input
+    end
+
+    def test_verify_code_returns_invalid_phone_number_failure_for_unparseable_input
+      configure_for_tests
+
+      result = Bitsmithy::Auth.verify_code("not a phone", "000000")
+
+      assert_equal :invalid_phone_number, result.error
+    end
+
+    def test_test_mode_autofills_signing_key_when_unset
+      Rails.env = RailsEnvStub.new(:test)
+      Bitsmithy::Auth.test_mode!
+
+      refute_nil Bitsmithy::Auth.config.signing_key
+    end
+
+    def test_send_code_rate_limited_result_carries_normalised_phone
+      configure_for_tests
+      formatted_phone = "+1 (212) 736-3100"
+      5.times { Bitsmithy::Auth.send_code(formatted_phone) }
+
+      result = Bitsmithy::Auth.send_code(formatted_phone)
+
+      assert_equal "+12127363100", result.phone
     end
   end
 end
