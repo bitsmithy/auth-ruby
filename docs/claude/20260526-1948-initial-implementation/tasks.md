@@ -184,6 +184,7 @@ Tested via a minimal fake controller class that includes the concern and exposes
 
 ## Slice 7: README, CHANGELOG, and integration walkthrough
 
+**Status:** ✅ Complete
 **Type:** HITL — prose needs editorial judgement
 **Blocked by:** Slices 1, 2, 3, 4, 5, 6
 **User stories covered:** all (the README is how Host-app developers discover what's in the gem)
@@ -206,11 +207,11 @@ Rewrite the bundler-generated README into v0.1.0 usage documentation. CHANGELOG 
 
 ### Acceptance criteria
 
-- [ ] README rendered on GitHub displays correctly — code blocks render, no broken links, no leftover bundler placeholders.
-- [ ] All three usage examples are runnable copy-paste; the reviewer can spot-check each by typing it into `bin/console` (or a Rails app for example 1).
-- [ ] CHANGELOG entry uses the project's commit-style format and lists the features added in v0.1.0.
-- [ ] No mention of features that did not actually land in slices 1–6.
-- [ ] User reviews and approves the prose; revisions land in additional commits if needed.
+- [x] README rendered on GitHub displays correctly — code blocks render, no broken links, no leftover bundler placeholders.
+- [x] All three usage examples are runnable copy-paste; the reviewer can spot-check each by typing it into `bin/console` (or a Rails app for example 1).
+- [x] CHANGELOG entry uses the project's commit-style format and lists the features added in v0.1.0.
+- [x] No mention of features that did not actually land in slices 1–6.
+- [x] User reviews and approves the prose; revisions land in additional commits if needed.
 
 ---
 
