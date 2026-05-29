@@ -42,7 +42,7 @@ module Bitsmithy
       end
 
       def decode_token(token)
-        Token.decode(token, config: @config)
+        Token.decode(token, config: config)
       end
 
       def normalize_phone(input, country: nil)
@@ -72,7 +72,7 @@ module Bitsmithy
 
       def rate_limiter
         @rate_limiter ||= RateLimiter.new(
-          store: config.rate_limit_store ||= Stores::MemoryStore.new,
+          store: config.rate_limit_store,
           max_attempts: config.rate_limit[:per_phone],
           window: config.rate_limit[:window]
         )

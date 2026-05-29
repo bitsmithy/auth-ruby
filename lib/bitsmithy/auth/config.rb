@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "errors"
+require_relative "stores/memory_store"
 
 module Bitsmithy
   module Auth
@@ -12,11 +13,16 @@ module Bitsmithy
 
       attr_accessor :signing_key, :otp_adapter, :session_duration,
                     :twilio_account_sid, :twilio_auth_token, :twilio_verify_service_sid,
-                    :rate_limit, :rate_limit_store
+                    :rate_limit
+      attr_writer :rate_limit_store
 
       def initialize
         @session_duration = DEFAULT_SESSION_DURATION
         @rate_limit = DEFAULT_RATE_LIMIT.dup
+      end
+
+      def rate_limit_store
+        @rate_limit_store ||= Stores::MemoryStore.new
       end
 
       def validate!
