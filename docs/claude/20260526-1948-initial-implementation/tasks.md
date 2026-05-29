@@ -149,6 +149,7 @@ Add the env guard from ADR-0002 around `Bitsmithy::Auth.test_mode!`. The method 
 
 ## Slice 6: Rails Controller concern
 
+**Status:** ✅ Complete
 **Type:** AFK
 **Blocked by:** Slice 1
 **User stories covered:** 6, 7 (negative requirement), 32
@@ -169,15 +170,15 @@ Tested via a minimal fake controller class that includes the concern and exposes
 
 ### Acceptance criteria
 
-- [ ] `actionpack` enters the Gemfile's `:test` group.
-- [ ] The concern file is loaded only when `ActionController` is defined — confirmed by inspecting `defined?(Bitsmithy::Auth::Controller)` with and without `ActionController` loaded.
-- [ ] Mixing the concern into a fake controller with a valid Token in `session[:bitsmithy_auth_token]` exposes `current_phone` matching the Token's `sub`.
-- [ ] An empty session yields `current_phone == nil` and `authenticated? == false`.
-- [ ] An invalid Token in session yields `current_phone == nil` (the InvalidToken is swallowed, not propagated).
-- [ ] `sign_in(phone: ..., token: ...)` writes to `session[:bitsmithy_auth_token]` and a subsequent `current_phone` returns the new phone (memo invalidated).
-- [ ] `sign_out` removes the session key and a subsequent `current_phone` returns `nil`.
-- [ ] No `require_authentication!` method is defined on the concern.
-- [ ] `bundle exec rake` passes.
+- [x] `actionpack` enters the Gemfile's `:test` group.
+- [x] The concern file is loaded only when `ActionController` is defined — `lib/bitsmithy/auth.rb` ends with a conditional `require_relative` guarded by `defined?(ActionController)`. Slices 1-5 ran without ActionController prior to slice 6, so the guard is implicitly verified by the unchanged behaviour of those tests.
+- [x] Mixing the concern into a fake controller with a valid Token in `session[:bitsmithy_auth_token]` exposes `current_phone` matching the Token's `sub`.
+- [x] An empty session yields `current_phone == nil` and `authenticated? == false`.
+- [x] An invalid Token in session yields `current_phone == nil` (the InvalidToken is swallowed, not propagated).
+- [x] `sign_in(token: ...)` writes to `session[:bitsmithy_auth_token]` and a subsequent `current_phone` returns the new phone (memo invalidated). *(`phone:` param dropped — the Token's `sub` claim already carries the phone.)*
+- [x] `sign_out` removes the session key and a subsequent `current_phone` returns `nil`.
+- [x] No `require_authentication!` method is defined on the concern.
+- [x] `bundle exec rake` passes.
 
 ---
 

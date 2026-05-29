@@ -10,6 +10,8 @@ require_relative "auth/rate_limiter"
 require_relative "auth/stores/memory_store"
 require_relative "auth/otp/test_adapter"
 
+require_relative "auth/controller" if defined?(ActionController)
+
 module Bitsmithy
   module Auth
     class << self
