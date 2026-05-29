@@ -1,24 +1,27 @@
-name: Ruby
+name: CI
 
 on:
   push:
     branches:
       - main
-
   pull_request:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
+    name: Test (Ruby ${{ matrix.ruby }})
     strategy:
+      fail-fast: false
       matrix:
         ruby:
           - '4.0.5'
-
     steps:
       - uses: actions/checkout@v6
         with:
@@ -28,5 +31,20 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Run the default task
-        run: bundle exec rake
+      - name: Run tests
+        run: bundle exec rake test
+
+  rubocop:
+    runs-on: ubuntu-latest
+    name: Rubocop
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0.5'
+          bundler-cache: true
+      - name: Run Rubocop
+        run: bundle exec rake rubocop
