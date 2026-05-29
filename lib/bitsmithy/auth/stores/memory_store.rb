@@ -12,15 +12,10 @@ module Bitsmithy
         def increment(key, window_seconds)
           @mutex.synchronize do
             now = Time.now.to_i
-            entry = @data[key]
+            @data.delete_if { |_k, v| v[:expires_at] <= now }
 
-            if entry.nil? || entry[:expires_at] <= now
-              @data[key] = { count: 1, expires_at: now + window_seconds }
-            else
-              entry[:count] += 1
-            end
-
-            @data[key][:count]
+            @data[key] ||= { count: 0, expires_at: now + window_seconds }
+            @data[key][:count] += 1
           end
         end
       end

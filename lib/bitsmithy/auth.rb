@@ -29,13 +29,16 @@ module Bitsmithy
         rate_limiter.check!("send_code:#{normalized}")
         config.otp_adapter.send_code(normalized)
       rescue RateLimited
-        Result.failure(error: :rate_limited, phone: phone)
+        Result.failure(error: :rate_limited, phone: normalized)
       rescue InvalidPhoneNumber
         Result.failure(error: :invalid_phone_number, phone: phone)
       end
 
       def verify_code(phone, code)
-        config.otp_adapter.verify_code(phone, code)
+        normalized = normalize_phone(phone)
+        config.otp_adapter.verify_code(normalized, code)
+      rescue InvalidPhoneNumber
+        Result.failure(error: :invalid_phone_number, phone: phone)
       end
 
       def decode_token(token)
@@ -50,14 +53,13 @@ module Bitsmithy
         Phone.redact(phone)
       end
 
-      # Test Methods
-
       def test_mode!
         unless defined?(Rails) && (Rails.env.test? || Rails.env.development?)
           raise ConfigurationError,
                 "#{self}.#{__method__} is only available in Rails test or development environments."
         end
 
+        config.signing_key ||= "test-signing-key-not-for-production"
         config.otp_adapter = OTP::TestAdapter.new(config)
       end
 
