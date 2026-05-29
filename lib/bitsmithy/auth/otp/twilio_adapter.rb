@@ -40,7 +40,7 @@ module Bitsmithy
         private
 
         def verify_service
-          twilio_client.verify.v2.services(@config.twilio_verify_service_sid)
+          @verify_service ||= twilio_client.verify.v2.services(@config.twilio_verify_service_sid)
         end
 
         def twilio_client

@@ -11,15 +11,15 @@ module Bitsmithy
           @config = config
         end
 
+        MAGIC_TEST_CODE = "000000"
+
         def send_code(phone)
           Result.success(phone: phone)
         end
 
         def verify_code(phone, code)
-          if code == "000000"
-            Token.encode(phone: phone, config: @config).then do |token|
-              Result.success(token: token, phone: phone)
-            end
+          if code == MAGIC_TEST_CODE
+            Result.success(token: Token.encode(phone: phone, config: @config), phone: phone)
           else
             Result.failure(error: :invalid_code, phone: phone)
           end

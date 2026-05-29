@@ -12,6 +12,9 @@ module Bitsmithy
 
       def self.redact(input)
         parsed = parse(input)
+        # Mask every digit EXCEPT the last 4 — lookahead ensures we don't
+        # mask the trailing four characters. Country code is preserved
+        # separately on the line below.
         national_redacted = parsed.national(false).gsub(/.(?=.{4})/, "*")
 
         "+#{parsed.country_code}#{national_redacted}"

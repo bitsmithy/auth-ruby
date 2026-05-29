@@ -30,11 +30,17 @@ module Bitsmithy
 
       def sign_in(token:)
         session[SESSION_KEY] = token
-        remove_instance_variable(:@current_identity) if defined?(@current_identity)
+        reset_current_identity!
       end
 
       def sign_out
         session.delete(SESSION_KEY)
+        reset_current_identity!
+      end
+
+      private
+
+      def reset_current_identity!
         remove_instance_variable(:@current_identity) if defined?(@current_identity)
       end
     end
