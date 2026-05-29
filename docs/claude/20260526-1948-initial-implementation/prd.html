@@ -958,9 +958,10 @@ section {
             <h4 class="module-card__name">Phone</h4>
             <span class="module-card__depth module-card__depth--deep">Deep</span>
           </div>
-          <p class="module-card__purpose">One method that hides all of phonelib's parsing, validation, and E.164 formatting.</p>
+          <p class="module-card__purpose">Hides all of phonelib's parsing, validation, and E.164 formatting. Exposes <code style="font-family: var(--font-mono);">normalized</code> for the E.164 result and <code style="font-family: var(--font-mono);">redact</code> for the masked form.</p>
           <div class="module-card__verbs">
-            <span class="verb-tag">normalize</span>
+            <span class="verb-tag">normalized</span>
+            <span class="verb-tag">redact</span>
           </div>
         </div>
 
@@ -1027,7 +1028,7 @@ section {
             <h4 class="module-card__name">Result · Identity · Errors</h4>
             <span class="module-card__depth module-card__depth--thin">Value</span>
           </div>
-          <p class="module-card__purpose">Immutable Data classes plus the exception hierarchy. Exception classes carry redacted-Phone messages per ADR-0004.</p>
+          <p class="module-card__purpose">Immutable Data classes plus the exception hierarchy. Exception messages on successfully-parsed Phones are redacted; <code style="font-family: var(--font-mono);">InvalidPhoneNumber</code> keeps raw input for debuggability — see ADR-0004.</p>
           <div class="module-card__verbs">
             <span class="verb-tag">success?</span>
             <span class="verb-tag">.phone</span>
@@ -1066,12 +1067,12 @@ section {
             <h4 class="module-card__name">Bitsmithy::Auth::Controller</h4>
             <span class="module-card__depth module-card__depth--thin">Concern</span>
           </div>
-          <p class="module-card__purpose">Reads and writes <code style="font-family: var(--font-mono);">session[:bitsmithy_auth_token]</code>. Memoises the decoded Identity per request; invalidates the memo on sign-in/sign-out. Deliberately omits <code style="font-family: var(--font-mono);">require_authentication!</code> — Host apps own redirect semantics.</p>
+          <p class="module-card__purpose">Reads and writes <code style="font-family: var(--font-mono);">session[:bitsmithy_auth_token]</code>. Memoises the decoded Identity per request; invalidates the memo on sign-in/sign-out. Deliberately omits <code style="font-family: var(--font-mono);">require_authentication!</code> — Host apps own redirect semantics. <code style="font-family: var(--font-mono);">sign_in(token:)</code> takes only the Token — the <code style="font-family: var(--font-mono);">sub</code> claim already carries the Phone.</p>
           <div class="module-card__verbs">
             <span class="verb-tag">current_phone</span>
             <span class="verb-tag">current_identity</span>
             <span class="verb-tag">authenticated?</span>
-            <span class="verb-tag">sign_in</span>
+            <span class="verb-tag">sign_in(token:)</span>
             <span class="verb-tag">sign_out</span>
           </div>
         </div>
@@ -1145,7 +1146,7 @@ section {
           <span class="story-group__count">8 stories</span>
         </div>
         <ol class="story-list">
-          <li>Exception messages redact Phones (per ADR-0004) — Sentry/Honeybadger never index full numbers.</li>
+          <li>Exception messages redact successfully-parsed Phones (per ADR-0004); failed-parse inputs keep raw form for debuggability.</li>
           <li>Public <code>redact_phone</code> helper for use in Host-app log statements.</li>
           <li>Default Rate limit (5 sends per Phone per hour) before Twilio is called — abuse incidents capped.</li>
           <li>Pluggable Store interface — swap to Redis when single-process state stops being enough.</li>
@@ -1413,7 +1414,7 @@ section {
 
     <div class="callout callout--info">
       <div class="callout__title">PII Redaction</div>
-      <p class="callout__body">Phone numbers are masked in every exception the gem raises — <code>+15555551234</code> becomes <code>+1******1234</code> before reaching error trackers (per ADR-0004). The gem exports <code>Bitsmithy::Auth.redact_phone</code> as a public helper so Host apps can use the same redaction in their own log statements. <code>Result#phone</code> stays unredacted (the success path needs it); README will steer Host apps toward <code>redact_phone(result.phone)</code> in any log line.</p>
+      <p class="callout__body">Successfully-parsed Phones surfacing in exceptions (rate-limit failures, Twilio operation failures) are masked — <code>+15555551234</code> becomes <code>+1******1234</code>. <strong>Failed-parse inputs in <code>InvalidPhoneNumber#message</code> keep the raw form</strong> for debuggability per ADR-0004's revised position — a string that failed <code>Phonelib.parse</code> may not be a phone at all, and the debuggability win outweighs the marginal PII protection. The gem exports <code>Bitsmithy::Auth.redact_phone</code> as a public helper so Host apps can mask Phones in their own log statements. <code>Result#phone</code> stays unredacted (the success path needs it); README will steer Host apps toward <code>redact_phone(result.phone)</code> in any log line.</p>
     </div>
   </section>
 
@@ -1653,6 +1654,59 @@ section {
     <div class="callout callout--info">
       <div class="callout__title">Cross-language portfolio</div>
       <p class="callout__body">This gem is the reference implementation. <code>bitsmithy/auth-python</code> and <code>bitsmithy/auth-go</code> will mirror its public semantics: the verbs, the error symbols, the Identity shape, the Token claim structure. Decisions taken here are binding on those repos.</p>
+    </div>
+  </section>
+
+  <!-- ====== VERIFICATION SUMMARY ====== -->
+  <section>
+    <div class="section-head">
+      <div class="section-label">Verification</div>
+      <h2 class="section-title">Fact-checked against the <em>shipped code.</em></h2>
+      <p class="section-lead">Every verifiable claim in this PRD was re-checked against the v0.1.0 implementation on <code style="font-family: var(--font-mono); padding: 1px 5px; background: var(--surface-recessed); font-size: 0.9em;">hh/initial-implementation</code> after the post-completion review pass.</p>
+    </div>
+
+    <div class="adr-list">
+      <div class="adr-card" style="border-left-color: var(--sage);">
+        <div class="adr-card__num" style="color: var(--sage);">CONFIRMED</div>
+        <h3 class="adr-card__title">~30 claims align with code</h3>
+        <p class="adr-card__decision">User stories, ADR pointers, Result/Identity field shapes, Token claim structure, HS256 algorithm, error symbol vocabulary, rate-limit default (5/Phone/hour), session_duration default (24h), test_mode! auto-fill, eight-module decomposition, Twilio Verify choice, multi-language portfolio plan.</p>
+      </div>
+
+      <div class="adr-card" style="border-left-color: var(--accent);">
+        <div class="adr-card__num" style="color: var(--accent);">CORRECTED</div>
+        <h3 class="adr-card__title">Phone module API surface</h3>
+        <p class="adr-card__decision">PRD listed one method <code style="font-family: var(--font-mono);">normalize</code>; implementation exposes <code style="font-family: var(--font-mono);">normalized</code>, <code style="font-family: var(--font-mono);">redact</code>, and a private <code style="font-family: var(--font-mono);">parse</code> helper. Method name updated to <code style="font-family: var(--font-mono);">normalized</code>.</p>
+      </div>
+
+      <div class="adr-card" style="border-left-color: var(--accent);">
+        <div class="adr-card__num" style="color: var(--accent);">CORRECTED</div>
+        <h3 class="adr-card__title">InvalidPhoneNumber message</h3>
+        <p class="adr-card__decision">PRD claimed the message uses the redacted form. ADR-0004 was revised in slice 2 to keep the <strong>raw input</strong> for debuggability of failed-parse cases. PRD prose now matches the ADR.</p>
+      </div>
+
+      <div class="adr-card" style="border-left-color: var(--accent);">
+        <div class="adr-card__num" style="color: var(--accent);">CORRECTED</div>
+        <h3 class="adr-card__title">Controller#sign_in signature</h3>
+        <p class="adr-card__decision">PRD listed <code style="font-family: var(--font-mono);">sign_in(phone:, token:)</code>; shipped as <code style="font-family: var(--font-mono);">sign_in(token:)</code> since the Token's <code style="font-family: var(--font-mono);">sub</code> claim carries the Phone. Updated.</p>
+      </div>
+
+      <div class="adr-card" style="border-left-color: var(--accent);">
+        <div class="adr-card__num" style="color: var(--accent);">CORRECTED</div>
+        <h3 class="adr-card__title">Conditional Controller loading order</h3>
+        <p class="adr-card__decision">PRD said "after defining the top-level surface"; the conditional require actually runs at the top of <code style="font-family: var(--font-mono);">lib/bitsmithy/auth.rb</code>, before the module body. Updated.</p>
+      </div>
+
+      <div class="adr-card" style="border-left-color: var(--accent);">
+        <div class="adr-card__num" style="color: var(--accent);">CORRECTED</div>
+        <h3 class="adr-card__title">Test file layout</h3>
+        <p class="adr-card__decision">PRD claimed "every module gets a unit-test file". In reality most module behaviour is exercised via the façade integration tests in <code style="font-family: var(--font-mono);">test_auth.rb</code>; five dedicated test files exist (Controller, Rate Limiting, Test Mode Guard, Token Decoding, TwilioAdapter). PRD testing section now reflects the actual layout.</p>
+      </div>
+
+      <div class="adr-card" style="border-left-color: var(--gold);">
+        <div class="adr-card__num" style="color: var(--gold);">FOLLOW-UP</div>
+        <h3 class="adr-card__title">TwilioAdapter 5xx coverage</h3>
+        <p class="adr-card__decision">Not a PRD bug — but implementation note worth flagging: <code style="font-family: var(--font-mono);">map_status_code</code> covers <code style="font-family: var(--font-mono);">500..529</code>, not the full <code style="font-family: var(--font-mono);">500..599</code> range. Codes 530+ fall through to <code style="font-family: var(--font-mono);">:twilio_error</code>. Consider widening if a future Twilio incident surfaces 530+ status codes.</p>
+      </div>
     </div>
   </section>
 

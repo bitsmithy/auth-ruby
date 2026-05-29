@@ -71,7 +71,7 @@ The gem decomposes into eight modules, grouped by layer.
 
 **Core API (framework-agnostic):**
 
-1. **Phone** — a deep module exposing one method, `normalize(input, country:)`, that returns an E.164 string or raises `InvalidPhoneNumber`. Wraps phonelib internally. The raised exception's message uses a redacted form of the input.
+1. **Phone** — a deep module exposing `normalized(input, country:)` (E.164 string, raises `InvalidPhoneNumber`), `redact(input)` (masked form for valid Phones), and a private `parse` helper shared by both. Wraps phonelib internally. The `InvalidPhoneNumber` message includes the **raw input** for debuggability — see ADR-0004's revised position on failed-parse inputs.
 2. **Token** — a deep module exposing `encode(phone:, config:)` returning a JWT string, and `decode(token, config:)` returning an Identity or raising `InvalidToken`. The Token carries `sub` (Phone), `iat`, `exp`, and `iss: "bitsmithy-auth"`; `decode` verifies the issuer claim. HS256 only.
 3. **OTP::Adapter** — interface contract: `send_code(phone) → Result`, `verify_code(phone, code) → Result`. Two implementations:
    - **OTP::TwilioAdapter** — wraps Twilio Verify. Maps known Twilio error codes into one of four Result error symbols: `:twilio_authentication_error` (Twilio 401), `:twilio_rate_limited` (Twilio 429), `:twilio_service_unavailable` (Twilio 5xx, timeouts), `:twilio_error` (anything else not mapped to a more specific symbol like `:invalid_phone_number` or `:max_check_attempts`). Specific Twilio Verify error codes (60200, 60202, 60203) map to phone-specific symbols.
@@ -83,7 +83,7 @@ The gem decomposes into eight modules, grouped by layer.
 
 **Rails integration (optional, conditionally loaded):**
 
-8. **Bitsmithy::Auth::Controller** — a Rails concern providing `current_phone`, `current_identity`, `authenticated?`, `sign_in(phone:, token:)`, and `sign_out`. Reads from and writes to `session[:bitsmithy_auth_token]`. Memoizes the decoded Identity per request; invalidates the memo on `sign_in`/`sign_out`. Deliberately does NOT include a `require_authentication!` helper — Host apps own redirect semantics. Loaded only when the `ActionController` constant is defined.
+8. **Bitsmithy::Auth::Controller** — a Rails concern providing `current_phone`, `current_identity`, `authenticated?`, `sign_in(token:)`, and `sign_out`. Reads from and writes to `session[:bitsmithy_auth_token]`. Memoizes the decoded Identity per request; invalidates the memo on `sign_in`/`sign_out`. Deliberately does NOT include a `require_authentication!` helper — Host apps own redirect semantics. Loaded only when the `ActionController` constant is defined. *(`sign_in` takes only `token:` — the Token's `sub` claim already carries the Phone, so passing it separately would be duplication.)*
 
 ### Result and Identity shapes
 
@@ -129,7 +129,7 @@ The exhaustive list of error symbols a Result can carry:
 ### PII redaction
 
 - `Bitsmithy::Auth.redact_phone(phone)` is a public helper returning a masked form: keep the country code prefix (`+1`) and the last four digits, replace the middle with asterisks. Example: `"+15555551234"` → `"+1******1234"`.
-- `InvalidPhoneNumber#message` includes the redacted form of the input that failed parsing, never the raw input.
+- `InvalidPhoneNumber#message` includes the **raw input** for debuggability per ADR-0004's revised position — a string that failed `Phonelib.parse` is by definition not a phone the gem recognises, so the debuggability win outweighs the marginal PII protection. Redaction applies only to exceptions surfacing a *successfully-parsed* Phone (rate-limit failures, Twilio operation failures, etc.).
 - `Result#phone` carries the un-redacted normalized Phone (Host apps need this to render "code sent to +1..1234" or to write to their own database). Logging `Result` raw will leak the Phone — the README will tell Host apps to use `redact_phone(result.phone)` in any log statement.
 
 ### Rate limit
@@ -141,7 +141,7 @@ The exhaustive list of error symbols a Result can carry:
 
 ### Conditional loading
 
-- `lib/bitsmithy/auth.rb` requires the core modules unconditionally. After defining the top-level surface, it conditionally requires `bitsmithy/auth/controller` if `ActionController` is defined at load time.
+- `lib/bitsmithy/auth.rb` requires the core modules unconditionally. Before defining the top-level surface, it conditionally requires `bitsmithy/auth/controller` if `ActionController` is defined at load time.
 - The controller concern itself requires `active_support/concern`. This is safe because `ActionController` being defined implies `ActiveSupport` is loaded.
 
 ### ADR pointers
@@ -167,18 +167,16 @@ Per the `testing.md` rules:
 
 ### Which modules are tested
 
-Every module identified in the module sketch gets a unit-test file, plus an integration-style file for the top-level `Bitsmithy::Auth` façade. Specifically:
+Most modules are tested through the top-level façade in `test/bitsmithy/test_auth.rb`. Modules with denser failure surfaces or distinct concerns got their own test files. Final test layout:
 
-- **Phone** — happy paths across format variations, raise paths for ambiguous and garbage input, raise messages confirmed to use the redacted form.
-- **Token** — encode produces a parseable JWT with correct claims; decode round-trips an Identity; decode raises `InvalidToken` for garbage, wrong signing key, expired token, and wrong issuer.
-- **Config** — defaults assert; `validate!` raises for each missing required field; passes when all are set.
-- **Result** — `Result.success` and `Result.failure` factories produce expected shapes; `success?` reflects the flag.
-- **RateLimiter** — check passes under the threshold; raises at the boundary; isolates per-key state.
-- **Stores::MemoryStore** — increment counts within the window; resets after the window; isolates per-key; explicit `reset` clears all.
-- **OTP::TestAdapter** — `send_code` always succeeds; `verify_code` succeeds only for `"000000"`; failure path returns `:invalid_code`.
-- **OTP::TwilioAdapter** — uses Mocha to stub the Twilio client chain. Asserts the correct chain methods are called with the right arguments; asserts the four error-symbol categorisations; asserts success returns a Token-bearing Result.
-- **Bitsmithy::Auth (top-level)** — `configure` yields a Config; `test_mode!` swaps the adapter; `send_code` normalises Phone before delegating; rate-limit failure surfaces as `:rate_limited` Result; invalid Phone surfaces as `:invalid_phone_number` Result; `decode_token` delegates correctly; `normalize_phone` delegates correctly.
-- **Bitsmithy::Auth::Controller** — tested via a minimal fake controller class that includes the concern and exposes a `session` hash. Covers happy and unhappy paths for `current_phone`, `current_identity`, `authenticated?`, and the memoisation behaviour of `sign_in`/`sign_out`.
+- **`test/bitsmithy/test_auth.rb`** — Façade integration. Covers Phone normalisation, Result happy/failure factories, Token round-trip, Config defaults + validate!, OTP::TestAdapter happy/wrong-code paths, redact_phone format, send_code/verify_code wiring, and the `InvalidPhoneNumber` raw-input message check.
+- **`test/bitsmithy/auth/test_token_decoding.rb`** — Token decode failure modes: garbage, wrong signing key, wrong issuer, expired Token. Extracted from test_auth.rb to keep that file under the Rubocop ClassLength limit.
+- **`test/bitsmithy/auth/test_rate_limiting.rb`** — RateLimiter + MemoryStore: rate-limit boundary, per-Phone isolation, window reset (via `Time.now` stub), mutex-protected concurrent burst, pluggable Store via `config.rate_limit_store`, default rate-limit values.
+- **`test/bitsmithy/auth/test_test_mode_guard.rb`** — `test_mode!` env guard: production/development/test/non-Rails outcomes; error message names allowed environments.
+- **`test/bitsmithy/auth/test_controller.rb`** — Rails Controller concern, tested via a minimal `FakeController` exposing a `session` Hash. Covers `current_phone`, `current_identity`, `authenticated?`, `sign_in(token:)`, `sign_out`, memoisation invalidation, and the negative requirement that no `require_authentication!` method exists.
+- **`test/bitsmithy/auth/otp/test_twilio_adapter.rb`** — Twilio adapter: success paths, all seven Twilio error mappings (60200/60202/60203 + HTTP 401/429/5xx + fallback), no-raise contract. Uses Mocha to stub the Twilio client chain.
+
+Module-specific files for Phone, Token (encode), Config, Result, OTP::TestAdapter, and MemoryStore were not extracted — their behaviour is fully exercised via the façade integration tests in test_auth.rb. If those test files outgrow test_auth.rb's ClassLength budget later, the natural next splits are: a `test_phone.rb` for normalisation/redaction format edge cases and a `test_config.rb` for validate! coverage.
 
 ### Test-stack choices
 
@@ -219,3 +217,23 @@ The following are deliberate exclusions from v0.1.0. Each has a reason; "we ran 
 - The gem deliberately has no opinion on persistence. A Host app integrating it does not need to add any migrations. The only persistent state introduced is whatever the Host app chooses to do with the verified Phone (typically a `users.phone` column).
 - The `signing_key` should be generated with at least 32 bytes of entropy. The README will tell Host apps to run `SecureRandom.hex(32)` and store the result in their secrets manager.
 - The default `session_duration` of 24 hours is overridable per Host app. Apps that want a different blast-radius/friction trade-off (e.g. an admin tool wanting 1 hour, a marketing site wanting 7 days) can set it during `configure`.
+
+---
+
+## Verification Summary
+
+This PRD was fact-checked against the v0.1.0 implementation on branch `hh/initial-implementation`.
+
+**Claims confirmed (≈30):** User stories, ADR pointers, Result and Identity field shapes, Token claim structure (`sub`/`iat`/`exp`/`iss`), HS256 algorithm, error symbol vocabulary, rate-limit default (5/Phone/hour), session_duration default (24h), test_mode! signing-key auto-fill, conditional Controller loading guard, the eight-module decomposition, the Twilio Verify backend choice, the multi-language portfolio (auth-ruby / auth-python / auth-go).
+
+**Corrections made:**
+
+- **Phone module API** — was described as a single method `normalize`; the implementation exposes `normalized`, `redact`, and a private `parse` helper. Method name is `normalized` (past tense), not `normalize`.
+- **`InvalidPhoneNumber` exception message** — PRD claimed the message uses the redacted form of the input. ADR-0004 was revised in slice 2 to keep the **raw input** for debuggability of failed-parse cases. Redaction applies only to successfully-parsed Phones surfacing in other exceptions. PRD prose now matches the ADR.
+- **`Controller#sign_in` signature** — was `sign_in(phone:, token:)` in the PRD; shipped as `sign_in(token:)` since the Token's `sub` claim already carries the Phone. PRD updated.
+- **Conditional Controller loading wording** — said "After defining the top-level surface, it conditionally requires…". The conditional `require_relative` runs at the top of `lib/bitsmithy/auth.rb` (line 13), **before** the module body (line 15). Updated.
+- **Test file layout** — said "Every module… gets a unit-test file." In reality most module behaviour is exercised via the façade integration in `test/bitsmithy/test_auth.rb`. Dedicated test files exist for Controller, Rate Limiting, Test Mode Guard, Token Decoding, and TwilioAdapter. PRD's testing section now reflects the actual layout.
+
+**Unverifiable claims:** none — every claim either confirmed against code or corrected against it.
+
+**Minor implementation note (not a PRD error):** TwilioAdapter's `map_status_code` maps `500..529 → :twilio_service_unavailable`. The PRD describes this as "5xx" generically. Twilio HTTP responses in `530..599` would fall through to `:twilio_error` instead. Not a contract violation but worth flagging if a future Twilio incident surfaces 530+ codes.
