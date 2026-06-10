@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasks — Mountable Engine: Less Host-App Boilerplate</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --font-mono:'Fira Code','SF Mono',Consolas,monospace;
+  --bg:#faf6f1; --surface:#fffdfa; --surface-2:#f4ece3;
+  --border:rgba(80,55,40,0.14); --border-bright:rgba(80,55,40,0.26);
+  --text:#2c211a; --text-dim:#796a5f;
+  --terra:#c2410c; --terra-dim:rgba(194,65,12,0.10);
+  --sage:#4d7c0f; --sage-dim:rgba(77,124,15,0.12);
+  --indigo:#3155a8; --indigo-dim:rgba(49,85,168,0.10);
+  --gold:#b45309; --gold-dim:rgba(180,83,9,0.12);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#1c1714; --surface:#241d18; --surface-2:#2c241d;
+  --border:rgba(220,190,160,0.14); --border-bright:rgba(220,190,160,0.28);
+  --text:#efe6dc; --text-dim:#b3a293;
+  --terra:#fb7a4a; --terra-dim:rgba(251,122,74,0.14);
+  --sage:#a3d36a; --sage-dim:rgba(163,211,106,0.14);
+  --indigo:#8fb0f0; --indigo-dim:rgba(143,176,240,0.14);
+  --gold:#fbbf24; --gold-dim:rgba(251,191,36,0.14);
+}}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:var(--font-body); color:var(--text); background:var(--bg);
+  background-image:radial-gradient(ellipse at 80% -10%,var(--terra-dim) 0%,transparent 55%),radial-gradient(ellipse at 0% 5%,var(--sage-dim) 0%,transparent 45%);
+  background-attachment:fixed; line-height:1.62; overflow-wrap:break-word; padding:0 0 90px;
+}
+.wrap{max-width:1060px; margin:0 auto; padding:0 26px}
+header.page{padding:62px 0 36px; margin-bottom:20px; border-bottom:2px solid var(--border-bright)}
+.kicker{font-family:var(--font-mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--terra); margin:0 0 14px}
+h1{font-size:39px; line-height:1.08; margin:0 0 16px; letter-spacing:-0.6px; font-weight:700}
+.lead{font-size:17px; color:var(--text-dim); max-width:72ch; margin:0}
+.stat-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:26px}
+.stat{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 18px; min-width:96px}
+.stat .n{font-size:26px; font-weight:700; line-height:1; font-family:var(--font-mono)}
+.stat .l{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim); margin-top:6px}
+.stat.afk .n{color:var(--sage)} .stat.hitl .n{color:var(--terra)} .stat.slices .n{color:var(--indigo)}
+h2{font-size:13px; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:2px; margin:54px 0 6px; display:flex; align-items:center; gap:10px}
+h2::before{content:''; width:10px; height:10px; background:var(--terra); border-radius:2px}
+.section-sub{color:var(--text-dim); margin:0 0 22px; font-size:14px}
+.mermaid-wrap{position:relative; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px 20px; overflow:auto; display:flex; justify-content:center; align-items:center; min-height:440px; cursor:grab; scrollbar-width:thin}
+.mermaid-wrap.is-panning{cursor:grabbing; user-select:none}
+.zoom-controls{position:absolute; top:8px; right:8px; display:flex; gap:2px; z-index:10; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:2px}
+.zoom-controls button{width:28px; height:28px; border:none; background:transparent; color:var(--text-dim); font-family:var(--font-mono); font-size:14px; cursor:pointer; border-radius:4px}
+.zoom-controls button:hover{background:var(--surface-2); color:var(--text)}
+.legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:12.5px; color:var(--text-dim)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.legend i{width:22px; height:0; border-top:3px solid var(--indigo); display:inline-block}
+.legend i.dash{border-top-style:dashed; border-top-color:var(--gold)}
+.slices{display:grid; gap:16px}
+.slice{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; position:relative; border-left:4px solid var(--sage)}
+.slice .top{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+.slice .num{font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--text-dim); background:var(--surface-2); padding:3px 9px; border-radius:5px}
+.slice h3{margin:0; font-size:18px; font-weight:700; flex:1; min-width:200px}
+.slice p{margin:0 0 12px; font-size:14px; color:var(--text-dim)}
+.pill{font-family:var(--font-mono); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; padding:3px 9px; border-radius:20px}
+.pill.afk{background:var(--sage-dim); color:var(--sage)} .pill.hitl{background:var(--terra-dim); color:var(--terra)}
+.slice .meta{display:flex; gap:10px; flex-wrap:wrap; font-size:11.5px; font-family:var(--font-mono); color:var(--text-dim); margin-bottom:12px}
+.slice .meta b{color:var(--indigo); font-weight:600}
+.ac{list-style:none; padding:0; margin:0; display:grid; gap:6px}
+.ac li{position:relative; padding-left:24px; font-size:13.5px}
+.ac li::before{content:'✓'; position:absolute; left:2px; color:var(--sage); font-weight:700}
+.story-tags{display:flex; gap:5px; flex-wrap:wrap; margin-top:4px}
+.story-tags .st{font-family:var(--font-mono); font-size:10px; padding:2px 6px; border-radius:4px; background:var(--indigo-dim); color:var(--indigo)}
+code{font-family:var(--font-mono); font-size:0.85em; background:var(--terra-dim); color:var(--terra); padding:1px 6px; border-radius:4px; overflow-wrap:break-word}
+table{width:100%; border-collapse:collapse; font-size:13px; background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border)}
+th{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); background:var(--surface-2)}
+tr:last-child td{border-bottom:none}
+td.cov{font-family:var(--font-mono); color:var(--indigo); font-weight:600}
+.callout{border:1px solid var(--border); border-left:4px solid var(--gold); background:var(--gold-dim); border-radius:10px; padding:14px 18px; font-size:14px; margin-top:18px}
+.callout b{color:var(--gold)}
+@media (max-width:760px){h1{font-size:30px} .wrap{padding:0 16px}}
+</style>
+</head>
+<body>
+<header class="page"><div class="wrap">
+  <p class="kicker">Vertical Slices · bitsmithy-auth</p>
+  <h1>Mountable Engine — Tasks</h1>
+  <p class="lead">Seven tracer-bullet slices, each cutting route → controller → primitive → session → render/redirect → request test end-to-end under Test mode. Numbered in dependency order; every slice is demoable on its own.</p>
+  <div class="stat-row">
+    <div class="stat slices"><div class="n">7</div><div class="l">Slices</div></div>
+    <div class="stat afk"><div class="n">7</div><div class="l">AFK</div></div>
+    <div class="stat hitl"><div class="n">0</div><div class="l">HITL</div></div>
+    <div class="stat"><div class="n">20</div><div class="l">Stories covered</div></div>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <h2>Dependency Graph</h2>
+  <p class="section-sub">Slice 1 is the foundation (engine boot + dummy-app test harness). The send→verify chain is the critical path; sign-out, the callback, and the guard fan out independently; everything converges on the docs/locale closeout.</p>
+  <div class="mermaid-wrap">
+    <div class="zoom-controls">
+      <button onclick="zoomDiagram(this,1.2)" title="Zoom in">+</button>
+      <button onclick="zoomDiagram(this,0.8)" title="Zoom out">&minus;</button>
+      <button onclick="resetZoom(this)" title="Reset">&#8634;</button>
+    </div>
+    <pre class="mermaid">
+flowchart TD
+  S1["Slice 1 · AFK<br/>Engine boots, mounts,<br/>renders Phone form"]
+  S2["Slice 2 · AFK<br/>Send step:<br/>send_code + pending Phone"]
+  S3["Slice 3 · AFK<br/>Verify step:<br/>sign_in + redirect"]
+  S4["Slice 4 · AFK<br/>Sign-out"]
+  S5["Slice 5 · AFK<br/>on_verified callback"]
+  S6["Slice 6 · AFK<br/>require_authentication!"]
+  S7["Slice 7 · AFK<br/>Locale completeness<br/>+ docs reconciliation"]
+  S1 --> S2 --> S3 --> S5
+  S1 --> S4
+  S1 --> S6
+  S2 --> S7
+  S3 --> S7
+  S4 --> S7
+  S5 --> S7
+  S6 --> S7
+  classDef crit stroke:#c2410c,stroke-width:3px;
+  classDef base stroke:#3155a8,stroke-width:3px;
+  classDef close stroke:#4d7c0f,stroke-width:3px,stroke-dasharray:5 4;
+  class S1 base;
+  class S2,S3 crit;
+  class S7 close;
+    </pre>
+  </div>
+  <div class="legend">
+    <span><i style="border-top-color:var(--indigo)"></i> foundation</span>
+    <span><i style="border-top-color:var(--terra)"></i> critical path (send → verify)</span>
+    <span><i class="dash"></i> convergence / closeout</span>
+  </div>
+
+  <h2>The Slices</h2>
+  <p class="section-sub">Each slice lists its blocker, the PRD user stories it covers, and its acceptance criteria.</p>
+  <div class="slices">
+
+    <div class="slice" style="border-left-color:var(--indigo)">
+      <div class="top"><span class="num">Slice 1</span><h3>Engine boots, mounts, and renders the Phone form</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>None</b></span><span>Stories: <b>1, 8, 9, 15, 16, 17, 18, 20</b></span></div>
+      <p>Foundation tracer bullet: a conditionally-loaded, namespace-isolated <code>Engine</code> + <code>SessionsController</code> whose first action renders the Host's Phone template. Stands up the dummy-app request-test harness, the configurable parent controller, and the fixed route-helper / template-name contract.</p>
+      <ul class="ac">
+        <li>Engine defined only under Rails; non-Rails <code>require</code> never loads it or pulls in Rails.</li>
+        <li>Dummy app mounts it; GET sign-in renders the Host Phone template (200) with its documented locals.</li>
+        <li>Parent controller is configurable; default resolves to the framework base controller.</li>
+        <li><code>railties</code> is dev-only; runtime dependency set unchanged.</li>
+        <li>Tests: mount+render request test; conditional-load + <code>parent_controller</code> unit tests.</li>
+      </ul>
+    </div>
+
+    <div class="slice">
+      <div class="top"><span class="num">Slice 2</span><h3>Send step — send the OTP, remember the pending Phone, advance</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>Slice 1</b></span><span>Stories: <b>3, 5, 6, 7, 16</b></span></div>
+      <p>POST action calls <code>send_code</code>; on success stores the pending Phone in a gem-owned session key and redirects to the code step; on expected failure re-renders the Phone form with an I18n error. Ships the <code>en</code> locale for every send-path error symbol.</p>
+      <ul class="ac">
+        <li>Valid Phone advances + persists pending Phone; unparseable Phone re-renders with <code>invalid_phone_number</code>.</li>
+        <li>Rate-limited send re-renders with <code>rate_limited</code>.</li>
+        <li>Shipped <code>en</code> resolves each send-path symbol; Host locale key overrides wording.</li>
+        <li>Tests assert via the resolved translation, not a hardcoded English literal.</li>
+      </ul>
+    </div>
+
+    <div class="slice" style="border-left-color:var(--terra)">
+      <div class="top"><span class="num">Slice 3</span><h3>Verify step — check the code, establish the session, redirect</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>Slice 2</b></span><span>Stories: <b>2, 4, 5, 13, 16</b></span></div>
+      <p>The money path. GET renders the code form (pending Phone as a local); POST calls <code>verify_code</code>, on success <code>sign_in(token:)</code> + clear pending Phone + redirect to <code>after_sign_in_path</code>; on failure re-render with I18n error, keep pending Phone. Adds <code>after_sign_in_path</code> (default root).</p>
+      <ul class="ac">
+        <li>Magic code establishes session so <code>current_identity</code>/<code>current_phone</code> resolve downstream, then redirects.</li>
+        <li><code>after_sign_in_path</code> defaults to root, honors override.</li>
+        <li>Wrong code re-renders code form with <code>invalid_code</code> and retains pending Phone; success clears it.</li>
+        <li>Request tests cover success redirect + downstream identity, wrong-code re-render, default/override.</li>
+      </ul>
+    </div>
+
+    <div class="slice">
+      <div class="top"><span class="num">Slice 4</span><h3>Sign-out — clear the session and redirect</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>Slice 1</b></span><span>Stories: <b>10, 2</b></span></div>
+      <p>DELETE action clears the session via the concern's <code>sign_out</code> and redirects to <code>after_sign_out_path</code> (default root).</p>
+      <ul class="ac">
+        <li>Sign-out clears the session (subsequent request unauthenticated) and redirects to <code>after_sign_out_path</code>.</li>
+        <li><code>after_sign_out_path</code> defaults to root, honors override.</li>
+        <li>Request test: sign-in → sign-out → cleared + redirect; unit test for default/override.</li>
+      </ul>
+    </div>
+
+    <div class="slice">
+      <div class="top"><span class="num">Slice 5</span><h3>Optional <code>on_verified</code> callback on success</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>Slice 3</b></span><span>Stories: <b>14</b></span></div>
+      <p>Optional config callback invoked exactly once on successful Verification — after session established + pending Phone cleared, before redirect — passing the verified Identity. Never invoked on failure; nil by default.</p>
+      <ul class="ac">
+        <li>Defaults to nil; unset leaves the success path unchanged.</li>
+        <li>Configured callback fires once on success with the Identity; redirect still occurs.</li>
+        <li>Failed verification never invokes it; request tests assert both.</li>
+      </ul>
+    </div>
+
+    <div class="slice">
+      <div class="top"><span class="num">Slice 6</span><h3>Opt-in <code>require_authentication!</code> guard</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>Slice 1</b></span><span>Stories: <b>11, 12</b></span></div>
+      <p>Concern gains opt-in <code>require_authentication!</code>: unauthenticated → redirect to <code>sign_in_path</code> (default Engine route); authenticated → no-op. Never auto-wired. Adds <code>sign_in_path</code>; reverses the existing absence test.</p>
+      <ul class="ac">
+        <li>Unauthenticated redirects to <code>sign_in_path</code> (defaults to Engine sign-in route, honors override).</li>
+        <li>Authenticated passes through; guard is opt-in (not auto-applied on include).</li>
+        <li>The old <code>test_concern_does_not_define_require_authentication_method</code> is replaced by behavior tests.</li>
+      </ul>
+    </div>
+
+    <div class="slice" style="border-left-color:var(--gold)">
+      <div class="top"><span class="num">Slice 7</span><h3>Error-locale completeness &amp; documentation reconciliation</h3><span class="pill afk">AFK</span></div>
+      <div class="meta"><span>Blocked by: <b>Slices 2–6</b></span><span>Stories: <b>6, 7, 9, 19, 20</b></span></div>
+      <p>Locale smoke test that every Engine-surfaced error symbol has an <code>en</code> default. Reconcile docs: README (mount + config, required templates + locals, <code>require_authentication!</code>, downstream identity mapping), move Engine/views out of the v0.2.0-deferred table, fix the gemspec description, add a CHANGELOG entry.</p>
+      <ul class="ac">
+        <li>Smoke test fails if any surfaced error symbol lacks an <code>en</code> default.</li>
+        <li>README documents mount/config/templates/guard/identity mapping; status table no longer defers Engine/views.</li>
+        <li>Gemspec description accurate; CHANGELOG entry added; no doc example hardcodes a Signing key.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <h2>Story Coverage</h2>
+  <p class="section-sub">Every one of the PRD's 20 user stories maps to at least one slice.</p>
+  <table>
+    <thead><tr><th style="width:14%">Slice</th><th>User stories</th></tr></thead>
+    <tbody>
+      <tr><td>Slice 1</td><td class="cov">1, 8, 9, 15, 16, 17, 18, 20</td></tr>
+      <tr><td>Slice 2</td><td class="cov">3, 5, 6, 7, 16</td></tr>
+      <tr><td>Slice 3</td><td class="cov">2, 4, 5, 13, 16</td></tr>
+      <tr><td>Slice 4</td><td class="cov">10, 2</td></tr>
+      <tr><td>Slice 5</td><td class="cov">14</td></tr>
+      <tr><td>Slice 6</td><td class="cov">11, 12</td></tr>
+      <tr><td>Slice 7</td><td class="cov">6, 7, 9, 19, 20</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><b>All AFK.</b> The grilling locked every design decision, so no slice needs a mid-implementation human gate. If you want a checkpoint after the foundation (Slice 1 fixes the route/template/locals contract everything builds on), say so and I'll mark it HITL.</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+mermaid.initialize({
+  startOnLoad:true, theme:'base', securityLevel:'loose',
+  themeVariables:{
+    fontFamily:"'Fira Code', monospace", fontSize:'14px',
+    primaryColor: dark?'#2c241d':'#fffdfa',
+    primaryTextColor: dark?'#efe6dc':'#2c211a',
+    primaryBorderColor: dark?'#8fb0f0':'#3155a8',
+    lineColor: dark?'#b3a293':'#796a5f',
+    secondaryColor: dark?'#241d18':'#f4ece3',
+    tertiaryColor: dark?'#241d18':'#f9f3ec'
+  }
+});
+function fitMermaidDiagrams(){
+  document.querySelectorAll('.mermaid-wrap').forEach(function(wrap){
+    var mEl=wrap.querySelector('.mermaid'), svg=mEl&&mEl.querySelector('svg');
+    if(!svg)return;
+    mEl.style.zoom=1;
+    var pad=56, svgW=svg.getBoundingClientRect().width, svgH=svg.getBoundingClientRect().height;
+    var z=Math.min((wrap.clientWidth-pad)/svgW,(wrap.clientHeight-pad)/svgH);
+    z=Math.max(z,1);
+    mEl.style.zoom=z; mEl.dataset.zoom=z; mEl.dataset.fitZoom=z;
+  });
+}
+var obs=new MutationObserver(function(m,o){if(document.querySelector('.mermaid svg')){o.disconnect();setTimeout(fitMermaidDiagrams,120);}});
+obs.observe(document.body,{childList:true,subtree:true});
+function zoomDiagram(btn,f){var t=btn.closest('.mermaid-wrap').querySelector('.mermaid');var c=parseFloat(t.dataset.zoom||1);var n=Math.min(Math.max(c*f,0.5),8);t.dataset.zoom=n;t.style.zoom=n;}
+function resetZoom(btn){var t=btn.closest('.mermaid-wrap').querySelector('.mermaid');var z=parseFloat(t.dataset.fitZoom||1);t.dataset.zoom=z;t.style.zoom=z;}
+document.querySelectorAll('.mermaid-wrap').forEach(function(wrap){
+  wrap.addEventListener('wheel',function(e){if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();var t=wrap.querySelector('.mermaid');var c=parseFloat(t.dataset.zoom||1);var n=Math.min(Math.max(c*(e.deltaY<0?1.1:0.9),0.5),8);t.dataset.zoom=n;t.style.zoom=n;},{passive:false});
+  var sx,sy,sl,st;
+  wrap.addEventListener('mousedown',function(e){if(e.target.closest('.zoom-controls'))return;wrap.classList.add('is-panning');sx=e.clientX;sy=e.clientY;sl=wrap.scrollLeft;st=wrap.scrollTop;});
+  window.addEventListener('mousemove',function(e){if(!wrap.classList.contains('is-panning'))return;wrap.scrollLeft=sl-(e.clientX-sx);wrap.scrollTop=st-(e.clientY-sy);});
+  window.addEventListener('mouseup',function(){wrap.classList.remove('is-panning');});
+});
+</script>
+</body>
+</html>
