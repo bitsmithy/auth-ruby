@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
                      "a mountable engine for the default sign-in flow."
   spec.homepage = "https://github.com/bitsmithy/auth-ruby"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.2.0"
+  spec.required_ruby_version = ">= 4.0.5"
   # Private gem — consumed via `gem 'bitsmithy-auth', github: 'bitsmithy/auth-ruby'`.
   # If switching to GitHub Packages or a private gem server, set allowed_push_host below.
   # spec.metadata["allowed_push_host"] = "https://rubygems.pkg.github.com/bitsmithy"
