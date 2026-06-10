@@ -6,6 +6,8 @@ AllCops:
   TargetRubyVersion: 4.0.5
   NewCops: enable
   SuggestExtensions: false
+  Exclude:
+    - "test/tmp/**/*"
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -14,4 +16,7 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 Style/Documentation:
+  Enabled: false
+
+Minitest/MultipleAssertions:
   Enabled: false

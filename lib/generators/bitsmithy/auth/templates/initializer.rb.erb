@@ -1,0 +1,20 @@
+Bitsmithy::Auth.configure do |c|
+  c.signing_key = ENV.fetch("BITSMITHY_AUTH_SIGNING_KEY")
+
+  if Rails.env.production?
+    require "bitsmithy/auth/otp/twilio_adapter"
+
+    c.twilio_account_sid        = ENV.fetch("TWILIO_ACCOUNT_SID")
+    c.twilio_auth_token         = ENV.fetch("TWILIO_AUTH_TOKEN")
+    c.twilio_verify_service_sid = ENV.fetch("TWILIO_VERIFY_SERVICE_SID")
+    c.otp_adapter               = Bitsmithy::Auth::OTP::TwilioAdapter.new(c)
+  else
+    Bitsmithy::Auth.test_mode!
+  end
+
+  # Optional overrides (uncomment and set as needed):
+  # c.after_sign_in_path  = "/"
+  # c.after_sign_out_path = "/"
+  # c.sign_in_path        = Bitsmithy::Auth::Engine.routes.url_helpers.sign_in_path
+  # c.on_verified         = ->(identity) { ... }
+end

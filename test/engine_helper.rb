@@ -2,6 +2,7 @@
 
 require_relative "dummy/config/environment"
 require "rails/test_help"
+require "rails/generators"
 require "mocha/minitest"
 
 module ActiveSupport
