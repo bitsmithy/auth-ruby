@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Install Generator — PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'SF Mono', Consolas, monospace;
+
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --border: rgba(0, 0, 0, 0.07);
+  --border-bright: rgba(0, 0, 0, 0.12);
+  --text: #1a1a2e;
+  --text-dim: #6b7280;
+  --accent: #0d9488;
+  --accent-dim: rgba(13, 148, 136, 0.08);
+  --node-a: #0d9488;
+  --node-a-dim: rgba(13, 148, 136, 0.1);
+  --node-b: #2563eb;
+  --node-b-dim: rgba(37, 99, 235, 0.1);
+  --node-c: #d97706;
+  --node-c-dim: rgba(217, 119, 6, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-elevated: #253446;
+    --border: rgba(255, 255, 255, 0.06);
+    --border-bright: rgba(255, 255, 255, 0.12);
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #2dd4bf;
+    --accent-dim: rgba(45, 212, 191, 0.1);
+    --node-a: #2dd4bf;
+    --node-a-dim: rgba(45, 212, 191, 0.12);
+    --node-b: #60a5fa;
+    --node-b-dim: rgba(96, 165, 250, 0.12);
+    --node-c: #fbbf24;
+    --node-c-dim: rgba(251, 191, 36, 0.12);
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  background-image:
+    radial-gradient(at 30% 20%, var(--node-a-dim) 0%, transparent 50%),
+    radial-gradient(at 70% 80%, var(--node-b-dim) 0%, transparent 50%);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 40px 24px;
+  overflow-wrap: break-word;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  margin-bottom: 48px;
+}
+
+.header__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.header__title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.header__subtitle {
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 580px;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 40px;
+}
+
+.section__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent);
+  display: inline-block;
+}
+
+.section__content {
+  color: var(--text);
+}
+
+.section__content p {
+  margin-bottom: 12px;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.card--hero {
+  background: color-mix(in srgb, var(--surface) 90%, var(--accent) 10%);
+  border-color: color-mix(in srgb, var(--border) 50%, var(--accent) 50%);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.card--accent-a {
+  border-left: 3px solid var(--node-a);
+}
+
+.card--accent-b {
+  border-left: 3px solid var(--node-b);
+}
+
+.card--accent-c {
+  border-left: 3px solid var(--node-c);
+}
+
+.card__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--node-a);
+  margin-bottom: 8px;
+}
+
+.card__title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card__text {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* User stories */
+.story-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: story;
+}
+
+.story-list li {
+  counter-increment: story;
+  padding: 14px 0 14px 36px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.story-list li:last-child {
+  border-bottom: none;
+}
+
+.story-list li::before {
+  content: counter(story);
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-list li strong {
+  font-weight: 600;
+}
+
+/* Decision list */
+.decision-list {
+  list-style: none;
+  padding: 0;
+}
+
+.decision-list li {
+  padding: 10px 0 10px 16px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+  border-bottom: 1px solid var(--border);
+}
+
+.decision-list li:last-child {
+  border-bottom: none;
+}
+
+.decision-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.decision-list li strong {
+  font-weight: 600;
+}
+
+/* Scope tags */
+.scope-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .scope-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scope-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--node-a-dim);
+  color: var(--node-a);
+  margin-right: 4px;
+  text-transform: uppercase;
+}
+
+.scope-tag--out {
+  background: var(--node-c-dim);
+  color: var(--node-c);
+}
+
+/* File list */
+.file-list {
+  list-style: none;
+  padding: 0;
+}
+
+.file-list li {
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-list li:last-child {
+  border-bottom: none;
+}
+
+.file-icon {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.file-path {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.file-action {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+/* Footer */
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  body { padding: 20px 16px; }
+  .header__title { font-size: 26px; }
+  .card { padding: 16px 18px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="header__label">Product Requirements Document</div>
+    <h1 class="header__title">Install Generator</h1>
+    <p class="header__subtitle">
+      A single <code style="font-family:var(--font-mono);font-size:14px;background:var(--accent-dim);color:var(--accent);padding:1px 6px;border-radius:4px;">rails generate bitsmithy:auth:install</code>
+      command that scaffolds everything a Host app needs to render the Engine's sign-in flow.
+    </p>
+  </header>
+
+  <!-- Problem & Solution -->
+  <section class="section">
+    <h2 class="section__title">Problem &amp; Solution</h2>
+    <div class="card card--hero">
+      <p style="margin-bottom:12px;">
+        After mounting the Engine, a Host app must create three things from scratch:
+        an initializer with the four required config fields, two view templates with
+        the correct locals and route helpers, and the <code style="font-family:var(--font-mono);font-size:13px;background:var(--accent-dim);color:var(--accent);padding:1px 5px;border-radius:3px;">mount</code> line in routes.
+        Each step is documented but not automated.
+      </p>
+      <p style="margin-bottom:0;">
+        The generator turns this from a read-copy-paste exercise into a single command.
+        Developers own every generated file and are free to edit them — the generator
+        is a starter, not a jail.
+      </p>
+    </div>
+  </section>
+
+  <!-- Generated Files -->
+  <section class="section">
+    <h2 class="section__title">Generated Files</h2>
+
+    <ul class="file-list">
+      <li>
+        <span class="file-icon">▶</span>
+        <span class="file-path">config/initializers/bitsmithy_auth.rb</span>
+        <span class="file-action">Create</span>
+      </li>
+      <li>
+        <span class="file-icon">▶</span>
+        <span class="file-path">app/views/bitsmithy/auth/sessions/new.html.erb</span>
+        <span class="file-action">Create</span>
+      </li>
+      <li>
+        <span class="file-icon">▶</span>
+        <span class="file-path">app/views/bitsmithy/auth/sessions/edit.html.erb</span>
+        <span class="file-action">Create</span>
+      </li>
+      <li>
+        <span class="file-icon">▶</span>
+        <span class="file-path">config/routes.rb</span>
+        <span class="file-action">Insert mount line</span>
+      </li>
+    </ul>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+      <div class="card card--accent-a">
+        <div class="card__label">Initializer</div>
+        <div class="card__text">
+          Production config with Twilio credentials from ENV vars;
+          dev/test auto-enables <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">test_mode!</code>
+          with a dummy signing key. Commented-out optional overrides for
+          <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">after_sign_in_path</code>,
+          <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">on_verified</code>, etc.
+        </div>
+      </div>
+      <div class="card card--accent-b">
+        <div class="card__label">Phone Form</div>
+        <div class="card__text">
+          Text input with <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">inputmode="tel"</code>,
+          posts to <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">send_code_path</code>,
+          displays <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">@error</code> when re-rendered.
+        </div>
+      </div>
+      <div class="card card--accent-c">
+        <div class="card__label">Code Form</div>
+        <div class="card__text">
+          Text input for the six-digit code, posts to
+          <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">verify_path</code>,
+          displays <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">@error</code> and
+          <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">@phone</code>.
+        </div>
+      </div>
+      <div class="card card--accent-a">
+        <div class="card__label">Route Insertion</div>
+        <div class="card__text">
+          <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">mount Bitsmithy::Auth::Engine => "/auth"</code>
+          added after the <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Rails.application.routes.draw</code>
+          opening. Skipped if already present.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Stories -->
+  <section class="section">
+    <h2 class="section__title">User Stories</h2>
+    <ol class="story-list">
+      <li><strong>Run one command.</strong> As a Host app developer, I want to run one generator command, so that I get a working initializer, view templates, and the mount line without reading the README.</li>
+      <li><strong>Production config from ENV.</strong> As a Host app developer, I want the generated initializer to configure Twilio credentials from ENV vars in production, so that my production setup is secure and follows Rails conventions.</li>
+      <li><strong>Auto test mode.</strong> As a Host app developer, I want the generated initializer to enable test mode in development and test environments automatically, so that I can develop and test without Twilio credentials.</li>
+      <li><strong>Renders immediately.</strong> As a Host app developer, I want the generated Phone-form and code-form templates to render with the correct form action and locals out of the box, so that the sign-in flow works immediately after generation.</li>
+      <li><strong>No duplicate mount.</strong> As a Host app developer, I want the mount line inserted into <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">config/routes.rb</code> without duplication if already present, so that routing works without manual editing.</li>
+      <li><strong>Idempotent.</strong> As a Host app developer, I want the generator to be idempotent — re-running it does not duplicate the mount line or overwrite my edited templates — so that it is safe to run again after upgrading the gem.</li>
+      <li><strong>Force reset.</strong> As a Host app developer, I want a <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">--force</code> flag to overwrite existing files when I intend to reset them, so that I can regenerate the defaults on demand.</li>
+      <li><strong>Safe upgrades.</strong> As a Host app developer upgrading the gem, I want to re-run the generator to get an updated initializer without losing my view templates, so that upgrades are low-risk.</li>
+    </ol>
+  </section>
+
+  <!-- Implementation Decisions -->
+  <section class="section">
+    <h2 class="section__title">Implementation Decisions</h2>
+
+    <div class="card card--accent-a">
+      <div class="card__label">Module</div>
+      <div class="card__title">InstallGenerator</div>
+      <div class="card__text">
+        A <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Rails::Generators::Base</code>
+        subclass at <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Bitsmithy::Auth::Generators::InstallGenerator</code>.
+        Namespaced under the gem's module, registered only when
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Rails::Generators</code> is defined — mirrors the existing
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Rails::Engine</code> and
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">ActionController</code> conditional guards.
+        Non-Rails consumers never load it.
+      </div>
+    </div>
+
+    <div class="card card--accent-b">
+      <div class="card__label">Contract</div>
+      <div class="card__title">Template ERBs</div>
+      <div class="card__text">
+        Three source templates shipped under
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">lib/generators/bitsmithy/auth/templates/</code>:
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">initializer.rb.erb</code>,
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">new.html.erb</code>,
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">edit.html.erb</code>.
+        The initializer branches on <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Rails.env.production?</code>
+        for ENV-based Twilio config vs. <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">test_mode!</code>.
+      </div>
+    </div>
+
+    <div class="card card--accent-c">
+      <div class="card__label">Behaviour</div>
+      <div class="card__title">Idempotence &amp; Overwrite</div>
+      <div class="card__text">
+        Standard Rails generator defaults: existing files are skipped unless
+        <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">--force</code> is passed.
+        The mount line insertion reads <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">config/routes.rb</code> and
+        checks for existing <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">mount Bitsmithy::Auth::Engine</code>
+        — never duplicated.
+      </div>
+    </div>
+
+    <div class="card card--accent-a">
+      <div class="card__label">Boundary</div>
+      <div class="card__title">No User Model, No Migration</div>
+      <div class="card__text">
+        Consistent with ADR-0003 and ADR-0007. The gem is a verification primitive;
+        the generator scaffolds only what the Engine needs to render. No User model,
+        no database migration, no sessions table.
+      </div>
+    </div>
+  </section>
+
+  <!-- Scope -->
+  <section class="section">
+    <h2 class="section__title">Scope</h2>
+    <div class="scope-grid">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--node-a);margin-bottom:10px;">In scope</div>
+        <div class="card" style="padding:12px 16px;">
+          <ul class="story-list" style="counter-reset:none;list-style:disc;padding-left:18px;">
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">Initializer scaffolding</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">View template creation</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">Route insertion</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;"><code style="font-family:var(--font-mono);font-size:11px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">--force</code> flag support</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">Conditional load guard</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--node-c);margin-bottom:10px;">Out of scope</div>
+        <div class="card" style="padding:12px 16px;">
+          <ul class="story-list" style="counter-reset:none;list-style:disc;padding-left:18px;">
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">User model or migration</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">Eject / customise controller</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">Non-Rails rake task</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">Shipping views in gem load</li>
+            <li style="counter-increment:none;padding:4px 0;border:none;font-size:13px;list-style:disc;">New runtime dependencies</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testing Decisions -->
+  <section class="section">
+    <h2 class="section__title">Testing Decisions</h2>
+    <div class="card">
+      <div class="card__text">
+        <p style="margin-bottom:10px;">
+          Use <code style="font-family:var(--font-mono);font-size:12px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">Rails::Generators::TestCase</code> with a minimal
+          Rails application scaffold — no database, no real routes. Tests assert
+          created file existence, file content markers, and idempotence:
+        </p>
+        <ul class="story-list" style="counter-reset:none;list-style:disc;padding-left:18px;">
+          <li style="counter-increment:none;padding:4px 0 4px 4px;border:none;font-size:13px;list-style:disc;">Initializer exists with production/ENV and dev/test guard markers</li>
+          <li style="counter-increment:none;padding:4px 0 4px 4px;border:none;font-size:13px;list-style:disc;">Both view templates exist at expected paths</li>
+          <li style="counter-increment:none;padding:4px 0 4px 4px;border:none;font-size:13px;list-style:disc;">Mount line present in routes.rb</li>
+          <li style="counter-increment:none;padding:4px 0 4px 4px;border:none;font-size:13px;list-style:disc;">Running twice does not duplicate mount line or overwrite files</li>
+          <li style="counter-increment:none;padding:4px 0 4px 4px;border:none;font-size:13px;list-style:disc;"><code style="font-family:var(--font-mono);font-size:11px;background:var(--accent-dim);color:var(--accent);padding:1px 4px;border-radius:3px;">--force</code> overwrites existing files</li>
+        </ul>
+        <p style="margin-top:10px;margin-bottom:0;">
+          No prior generator tests exist in this codebase; these follow standard
+          Rails generator testing conventions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADR Note -->
+  <section class="section">
+    <h2 class="section__title">ADR Note</h2>
+    <div class="card card--accent-c">
+      <div class="card__text">
+        <p style="margin-bottom:0;">
+          ADR-0008 says the engine ships no views. The generator scaffolding views
+          <em>into the host app</em> does not violate this — it creates host-owned
+          files that the user is free to edit, eject, or delete. The engine itself
+          still has zero views. A new ADR codifies this distinction.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    bitsmithy-auth · docs/features/20260610-1452-install-generator/prd.md
+  </footer>
+
+</div>
+</body>
+</html>
