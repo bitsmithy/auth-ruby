@@ -13,6 +13,8 @@ module Dummy
     config.hosts.clear
     config.action_controller.allow_forgery_protection = false
 
+    config.cache_store = :memory_store
+
     # Point Rails.root at the dummy app so config/routes.rb is found
     config.root = File.expand_path("..", __dir__)
   end
