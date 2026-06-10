@@ -52,6 +52,14 @@ _Avoid_: secret, key, JWT secret.
 The pre-send gate that limits `send_code` attempts per Phone per window. Independent of Twilio Verify's own per-service limits.
 _Avoid_: throttle, gate.
 
+**Engine**:
+The mountable Rails engine that drives the **Verification flow** end-to-end — it owns the routes and controller, manages the pending-**Phone** session state, and issues the **Token**. It produces an **Identity** and nothing more: it never touches a host app's user records, and it ships no views. Mounted in a single line; all meaning is delegated to the **Host app**.
+_Avoid_: app, plugin, mountable app, sign-in engine.
+
+**Verification flow**:
+The host-facing sequence the **Engine** drives: enter **Phone** → receive **OTP** → enter code → **Token** issued and stored in `session[]`. Comprises a send step and a verify step, each rendering a host-owned template. On success the **Host app** is redirected to its configured landing path; on an expected failure the same step re-renders with an error.
+_Avoid_: login flow, sign-in flow, auth flow, wizard.
+
 ## Example dialogue
 
 > **Dev:** When a phone is verified, do we mark the User active?
