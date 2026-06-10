@@ -18,4 +18,5 @@ gem "rubocop-rake", require: false
 
 group :test do
   gem "actionpack", "~> 8.0"
+  gem "railties", "~> 8.0"
 end

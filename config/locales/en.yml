@@ -1,0 +1,7 @@
+---
+en:
+  bitsmithy_auth:
+    errors:
+      invalid_code: "That code doesn't match. Please try again."
+      invalid_phone_number: "That phone number doesn't look valid."
+      rate_limited: "Too many attempts. Please try again later."

@@ -11,14 +11,18 @@ module Bitsmithy
       DEFAULT_SESSION_DURATION = 86_400 # 24h per ADR-0001
       DEFAULT_RATE_LIMIT = { per_phone: 5, window: 3_600 }.freeze
 
-      attr_accessor :signing_key, :otp_adapter, :session_duration,
+      attr_accessor :signing_key, :otp_adapter, :session_duration, :rate_limit,
                     :twilio_account_sid, :twilio_auth_token, :twilio_verify_service_sid,
-                    :rate_limit
+                    :sign_in_path,
+                    :after_sign_in_path, :after_sign_out_path,
+                    :on_verified
       attr_writer :rate_limit_store
 
       def initialize
         @session_duration = DEFAULT_SESSION_DURATION
         @rate_limit = DEFAULT_RATE_LIMIT.dup
+        @after_sign_in_path = "/"
+        @after_sign_out_path = "/"
       end
 
       def rate_limit_store

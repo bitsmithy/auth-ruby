@@ -1,5 +1,20 @@
 ## [Unreleased]
 
+### Added
+
+- **Mountable Rails engine** (`Bitsmithy::Auth::Engine`) — isolated-namespace
+  engine that owns the full sign-in flow. Mount with one line in routes;
+  host app provides two view templates (Phone form, code form).
+- **Engine actions** — new, create (send code), edit (code form), update (verify
+  code), destroy (sign out).
+- **Configuration additions** — `after_sign_in_path`, `after_sign_out_path`,
+  `sign_in_path`, `on_verified` callback.
+- **`require_authentication!`** — opt-in before-action guard on the Controller
+  concern. Redirects unauthenticated requests to the configured sign-in path.
+  Reverses the prior deliberate omission documented in v0.1.0.
+- **Shipped `en` locale** — default messages for `invalid_phone_number`,
+  `rate_limited`, and `invalid_code` under `bitsmithy_auth.errors`.
+
 ## [0.1.0] - 2026-05-28
 
 Initial release. Phone-number OTP authentication primitive for Ruby applications.
@@ -43,8 +58,3 @@ Six ADRs in `docs/adr/` document the load-bearing choices:
 - 0005 — Twilio Verify as OTP backend
 - 0006 — Pattern A cross-language naming convention
 
-### Not in v0.1.0 (planned for v0.2.0+)
-
-Mountable Rails engine with default sign-in views; install generator;
-Redis-backed rate-limit Store; voice / WhatsApp OTP channels; email OTP;
-TOTP / authenticator-app codes.
