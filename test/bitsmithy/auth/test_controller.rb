@@ -70,8 +70,8 @@ module Bitsmithy
         assert_nil controller.current_phone
       end
 
-      def test_concern_does_not_define_require_authentication_method
-        refute_respond_to FakeController.new, :require_authentication!
+      def test_concern_defines_require_authentication_method
+        assert_respond_to FakeController.new, :require_authentication!
       end
     end
   end

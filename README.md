@@ -8,14 +8,21 @@ Backed by [Twilio Verify](https://www.twilio.com/docs/verify) — Twilio owns OT
 
 ## Status — v0.1.0
 
-| In v0.1.0 | Deferred to v0.2.0 |
-|---|---|
-| Framework-agnostic core API | Mountable Rails engine + default views |
-| Rails `Controller` concern (optional) | Install generator |
-| Twilio Verify production adapter | Redis-backed rate-limit store |
-| Per-Phone rate limiting (in-memory store) | Voice / WhatsApp channels |
-| PII-redacting `redact_phone` helper | Email OTP / TOTP |
-| `test_mode!` with Rails-env guard | |
+| Shipped |
+|---|
+| Framework-agnostic core API |
+| Rails `Controller` concern (optional) |
+| Twilio Verify production adapter |
+| Per-Phone rate limiting (in-memory store) |
+| PII-redacting `redact_phone` helper |
+| `test_mode!` with Rails-env guard |
+| Mountable Rails engine (no shipped views) |
+| Opt-in `require_authentication!` guard |
+| Shipped `en` locale for error messages |
+
+### Future (not yet shipped)
+
+Install generator, Redis-backed rate-limit store, voice / WhatsApp channels, email OTP / TOTP.
 
 ## Installation
 
@@ -109,62 +116,107 @@ You get:
 | `authenticated?` | `!current_identity.nil?` |
 | `sign_in(token:)` | Writes the Token to session; invalidates the memoised identity |
 | `sign_out` | Clears the session key; invalidates the memo |
+| `require_authentication!` | Redirects to the configured sign-in path (default the Engine's sign-in route) if not authenticated — see [Engine](#mountable-engine) below. Opt-in per controller: `before_action :require_authentication!` |
 
-Deliberately **no `require_authentication!`** — host apps own redirect semantics. The four-line pattern:
+`require_authentication!` is the opt-in guard. Add it to any controller (or your `ApplicationController`) with a single `before_action` — it is never auto-applied.
+
+## Mountable engine
+
+When `Rails::Engine` is available (Rails app with `railties`), the gem ships `Bitsmithy::Auth::Engine` — a mountable Rails engine that owns the entire sign-in flow.
+
+### One-line mount
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  mount Bitsmithy::Auth::Engine => "/auth"
+end
+```
+
+This gives you these routes:
+
+| Method | Path | Engine action | Named helper |
+|---|---|---|---|
+| GET | `/auth/sign_in` | `sessions#new` | `sign_in_path` |
+| POST | `/auth/send_code` | `sessions#create` | `send_code_path` |
+| GET | `/auth/code` | `sessions#edit` | `code_path` |
+| POST | `/auth/verify` | `sessions#update` | `verify_path` |
+| DELETE | `/auth/sign_out` | `sessions#destroy` | `sign_out_path` |
+
+### Required templates
+
+The engine **ships no views** (ADR-0008). Your app must provide two templates:
+
+**`app/views/bitsmithy/auth/sessions/new.html.erb`** — Phone-entry form.
+
+| Local / helper | Description |
+|---|---|
+| `@error` | Error message string when re-rendered after a failure (nil on first load) |
+| `send_code_path` | Named route helper for the send step (POST) |
+
+**`app/views/bitsmithy/auth/sessions/edit.html.erb`** — Code-entry form.
+
+| Local / helper | Description |
+|---|---|
+| `@phone` | The pending Phone (E.164 string) stored from the send step |
+| `@error` | Error message string when re-rendered after a failure (nil on first load) |
+| `verify_path` | Named route helper for the verify step (POST) |
+
+### Configuration
+
+Configure the engine in the same initializer you already use:
+
+```ruby
+# config/initializers/bitsmithy_auth.rb
+Bitsmithy::Auth.configure do |c|
+  c.signing_key               = ENV.fetch("BITSMITHY_AUTH_SIGNING_KEY")
+  c.twilio_account_sid        = ENV.fetch("TWILIO_ACCOUNT_SID")
+  c.twilio_auth_token         = ENV.fetch("TWILIO_AUTH_TOKEN")
+  c.twilio_verify_service_sid = ENV.fetch("TWILIO_VERIFY_SERVICE_SID")
+  c.otp_adapter               = Bitsmithy::Auth::OTP::TwilioAdapter.new(c)
+
+  # Optional overrides (defaults shown):
+  # c.session_duration = 86_400
+  # c.after_sign_in_path  = "/"
+  # c.after_sign_out_path = "/"
+  # c.on_verified         = ->(identity) { ... }
+end
+```
+
+| Config | Default | Description |
+|---|---|---|
+| `after_sign_in_path` | `"/"` | Where to redirect after successful verification |
+| `after_sign_out_path` | `"/"` | Where to redirect after sign-out |
+| `sign_in_path` | Engine's sign-in route (`/auth/sign_in` when mounted at `/auth`) | Redirect target for `require_authentication!` — can be overridden by host |
+| `on_verified` | `nil` | Optional callback invoked with the verified Identity on successful verification |
+
+### Using `require_authentication!`
+
+The engine Controller concern provides an opt-in `require_authentication!` guard. Add it to any controller to protect actions:
 
 ```ruby
 class ApplicationController < ActionController::Base
   include Bitsmithy::Auth::Controller
   before_action :require_authentication!
-
-  private
-
-  def require_authentication!
-    redirect_to sign_in_path unless authenticated?
-  end
 end
 ```
 
-## Sign-in controller (host-app code)
+Unauthenticated requests are redirected to the configured `sign_in_path` (default: the engine's sign-in route). The engine's own controller skips this guard so the sign-in flow stays accessible.
 
-Roughly thirty lines. Host apps write their own — the gem does not ship a default sign-in flow in v0.1.0.
+### Mapping the verified Identity downstream
+
+After a successful sign-in, `current_identity` returns the decoded Identity. Map the verified phone to your own user records wherever you need it:
 
 ```ruby
-class SessionsController < ApplicationController
-  skip_before_action :require_authentication!
+# app/controllers/application_controller.rb
+def current_user
+  return unless current_identity
 
-  def new
-  end
-
-  def create
-    result = Bitsmithy::Auth.send_code(params[:phone])
-    if result.success?
-      session[:pending_phone] = result.phone
-      render :verify
-    else
-      flash.now[:error] = error_message_for(result.error)
-      render :new
-    end
-  end
-
-  def verify
-    result = Bitsmithy::Auth.verify_code(session[:pending_phone], params[:code])
-    if result.success?
-      sign_in(token: result.token)
-      session.delete(:pending_phone)
-      redirect_to root_path
-    else
-      flash.now[:error] = "That code didn't match — try again."
-      render :verify
-    end
-  end
-
-  def destroy
-    sign_out
-    redirect_to root_path
-  end
+  @current_user ||= User.find_or_create_by!(phone: current_identity.phone)
 end
 ```
+
+The engine never owns a User model — you decide what a verified phone means.
 
 ## Test mode
 
@@ -179,6 +231,8 @@ Then in tests, `send_code` always succeeds and `verify_code(phone, "000000")` al
 `test_mode!` raises `ConfigurationError` outside `Rails.env.test?` / `Rails.env.development?`, and refuses in non-Rails contexts entirely. See [`docs/adr/0002`](docs/adr/0002-test-mode-rails-env-guard.md) for why this guard is non-negotiable.
 
 ## Error vocabulary
+
+Error messages for the engine-flow symbols (`invalid_phone_number`, `rate_limited`, `invalid_code`) are shipped in the `en` locale under `bitsmithy_auth.errors.<symbol>`. Host apps override by defining the same keys in their own locale files. See also the [Mountable engine](#mountable-engine) section.
 
 `Result#error` is always one of:
 

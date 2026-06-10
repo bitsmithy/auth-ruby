@@ -1,0 +1,8 @@
+<% if @error.present? %>
+  <div class="error"><%= @error %></div>
+<% end %>
+<%= form_tag("/auth/send_code") do %>
+  <%= label_tag :phone, "Phone number" %>
+  <%= telephone_field_tag :phone %>
+  <%= submit_tag "Send code" %>
+<% end %>

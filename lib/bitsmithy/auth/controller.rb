@@ -28,6 +28,12 @@ module Bitsmithy
         !current_identity.nil?
       end
 
+      def require_authentication!
+        return if authenticated?
+
+        redirect_to Bitsmithy::Auth.config.sign_in_path || Engine.routes.url_helpers.sign_in_path
+      end
+
       def sign_in(token:)
         session[SESSION_KEY] = token
         reset_current_identity!
