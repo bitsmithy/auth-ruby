@@ -2,6 +2,7 @@
 
 require_relative "errors"
 require_relative "stores/memory_store"
+require_relative "stores/rails_cache_store"
 
 module Bitsmithy
   module Auth
@@ -10,6 +11,8 @@ module Bitsmithy
       JWT_ALGORITHM = "HS256"
       DEFAULT_SESSION_DURATION = 86_400 # 24h per ADR-0001
       DEFAULT_RATE_LIMIT = { per_phone: 5, window: 3_600 }.freeze
+      CACHE_MISSING_WARNING = "[bitsmithy-auth] Rails.cache is nil — configure config.cache_store " \
+                              "for cross-worker rate limiting. Falling back to MemoryStore."
 
       attr_accessor :signing_key, :otp_adapter, :session_duration, :rate_limit,
                     :twilio_account_sid, :twilio_auth_token, :twilio_verify_service_sid,
@@ -26,7 +29,16 @@ module Bitsmithy
       end
 
       def rate_limit_store
-        @rate_limit_store ||= Stores::MemoryStore.new
+        @rate_limit_store ||= if defined?(Rails) && Rails.respond_to?(:cache)
+                                if Rails.cache
+                                  Stores::RailsCacheStore.new(Rails.cache)
+                                else
+                                  warn CACHE_MISSING_WARNING
+                                  Stores::MemoryStore.new
+                                end
+                              else
+                                Stores::MemoryStore.new
+                              end
       end
 
       def validate!
