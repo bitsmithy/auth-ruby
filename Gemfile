@@ -15,6 +15,7 @@ gem "warning", "~> 1.5", require: false
 gem "rubocop", "~> 1.21"
 gem "rubocop-minitest", require: false
 gem "rubocop-rake", require: false
+gem "rubocop-rspec", require: false
 
 group :test do
   gem "actionpack", "~> 8.0"
