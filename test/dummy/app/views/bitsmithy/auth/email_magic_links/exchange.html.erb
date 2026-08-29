@@ -1,0 +1,5 @@
+<h1>Opening securely</h1>
+<%= form_with url: verify_email_magic_link_path, id: "magic-link-exchange" do %>
+  <%= hidden_field_tag :credential %>
+<% end %>
+<script>const credential = window.location.hash;</script>

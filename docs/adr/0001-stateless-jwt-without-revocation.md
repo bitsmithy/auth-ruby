@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0009
+---
+
 # Stateless JWT tokens with no revocation list
 
 For v0.1.0, Tokens are signed JWTs (HS256) carrying an `exp` claim and no server-side state. `sign_out` clears the session cookie but does not invalidate the Token — a leaked Token remains valid until `exp`. The default `session_duration` is 24 hours, chosen so the blast radius of a leaked Token stays small without forcing users through SMS verification every page load.

@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0009
+---
+
 # Test mode is guarded by Rails environment
 
 `Bitsmithy::Auth.test_mode!` raises `ConfigurationError` unless `Rails.env.test?` or `Rails.env.development?` is true at call time. No environment-variable escape hatch is provided. In non-Rails contexts (no `Rails` constant defined) the method also refuses — those consumers can stub the OTP adapter directly instead.

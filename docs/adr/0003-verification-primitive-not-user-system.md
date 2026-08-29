@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0009
+---
+
 # Gem is a verification primitive; lifecycle is host-app concern
 
 This gem provides exactly one thing: proof that someone controls a Phone at a point in time, expressed as a signed Token decoded into an Identity. Everything user-shaped — the User record itself, sign-up vs sign-in distinctions, phone-number change flows, hard revocation ("kick this user out now"), session management beyond Token expiry, account merge, account deletion — is left to the host app.

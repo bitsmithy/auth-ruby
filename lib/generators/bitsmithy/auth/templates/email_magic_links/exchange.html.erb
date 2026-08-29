@@ -1,0 +1,17 @@
+<main>
+  <h1>Opening securely…</h1>
+  <p role="status" aria-live="polite">Checking this single-use link.</p>
+  <%%= form_with url: verify_email_magic_link_path, id: "magic-link-exchange" do %>
+    <%%= hidden_field_tag :credential %>
+  <%% end %>
+</main>
+<script>
+  (() => {
+    const parameters = new URLSearchParams(window.location.hash.slice(1));
+    const credential = parameters.get("credential");
+    window.history.replaceState(null, "", window.location.pathname);
+    if (!credential) return;
+    document.querySelector("#magic-link-exchange input[name='credential']").value = credential;
+    document.getElementById("magic-link-exchange").requestSubmit();
+  })();
+</script>

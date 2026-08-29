@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0009
+---
+
 # Mountable engine drives the verification flow, not the user lifecycle
 
 The gem ships `Bitsmithy::Auth::Engine`, a mountable Rails engine that a host app installs in one line (`mount Bitsmithy::Auth::Engine => "/auth"`) plus configuration. The engine owns the routes and the controller for the two-step Verification flow (send code → verify code → sign out), manages the pending-Phone session state internally, and on success establishes the session (stores the Token) and redirects to a configurable `after_sign_in_path`. The host injects "what a verified Identity means" downstream by reading `current_identity`/`current_phone` wherever it needs the user — there is no mandatory mid-flow callback (an optional `on_verified` hook exists for hosts that want to react at verify time).

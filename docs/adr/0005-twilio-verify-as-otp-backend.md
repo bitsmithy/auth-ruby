@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0009
+---
+
 # Twilio Verify is the OTP backend
 
 The gem delegates OTP generation, delivery, expiry, attempt limiting, and SMS-pumping fraud detection to Twilio Verify (Twilio's managed verification SaaS). The gem itself never generates, stores, expires, or counts attempts against an OTP — those concerns live on Twilio's side, keyed by a per-host-app Verify Service SID.

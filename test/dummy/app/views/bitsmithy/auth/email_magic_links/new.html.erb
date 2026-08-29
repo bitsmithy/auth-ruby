@@ -1,0 +1,5 @@
+<h1>Continue with email</h1>
+<%= form_with url: email_magic_links_path do %>
+  <%= email_field_tag :email, params[:email], required: true %>
+  <%= submit_tag "Email me a link" %>
+<% end %>

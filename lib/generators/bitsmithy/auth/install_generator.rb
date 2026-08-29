@@ -8,8 +8,12 @@ module Bitsmithy
 
         def install
           template "initializer.rb.erb", "config/initializers/bitsmithy_auth.rb"
-          template "new.html.erb", "app/views/bitsmithy/auth/sessions/new.html.erb"
-          template "edit.html.erb", "app/views/bitsmithy/auth/sessions/edit.html.erb"
+          template "federated_authentications/new.html.erb",
+                   "app/views/bitsmithy/auth/federated_authentications/new.html.erb"
+          %w[new sent error exchange].each do |name|
+            template "email_magic_links/#{name}.html.erb",
+                     "app/views/bitsmithy/auth/email_magic_links/#{name}.html.erb"
+          end
           insert_mount_line
         end
 
