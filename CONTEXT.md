@@ -1,72 +1,74 @@
-# bitsmithy-auth
+# RubyAuth
 
-A Ruby gem that verifies a phone number via SMS OTP and returns a signed token. It is a verification primitive, not a user management system — host apps map verified phones to their own user models.
+RubyAuth is a stateless Ruby authentication library that validates Apple, Google, Email Magic Link, and Passkey credentials.
+It returns Authentication Evidence while each Host Application owns identity, persistence, sessions, authorization, and lifecycle.
 
 ## Language
 
-**Host app**:
-The Ruby application that depends on this gem to verify users.
-_Avoid_: client, consumer, parent app.
+**Host Application**:
+A Ruby application that uses RubyAuth to validate a Sign-in Method and decides what the successful evidence means.
+The Host Application supplies configuration and every durable or temporary state operation.
+_Avoid_: Client, consumer, parent app
 
-**Identity**:
-The verification artifact returned by `decode_token`. Carries a phone, the time it was issued, and the time it expires. It is NOT a user — host apps map an Identity's phone to their own user records.
-_Avoid_: User, Account, Session, Principal.
+**Sign-in Method**:
+A way to authenticate through Apple, Google, a Verified Email, or a Passkey.
+RubyAuth validates a Sign-in Method but never attaches it to an application user.
+_Avoid_: User, account, session
 
-**Phone**:
-A phone number normalised to E.164 format. The only identifier this gem knows about.
-_Avoid_: number, msisdn, telephone, mobile.
-
-**Verification**:
-The act of confirming someone controls a phone — sending an OTP, then checking the entered code. Comprises a send step and a verify step.
-_Avoid_: authentication, login, sign-in.
-
-**OTP**:
-A short numeric code (six digits) sent to a phone via SMS. Generated, expired, and attempt-limited by Twilio Verify, not by this gem.
-_Avoid_: code (when ambiguous), pin, password.
-
-**Token**:
-The signed JWT issued on successful verification. Carries the verified phone as the `sub` claim, plus `iat`, `exp`, and `iss: "bitsmithy-auth"`. The host app stores it (typically in `session[]`) and presents it back on subsequent requests, where `decode_token` turns it into an Identity.
-_Avoid_: JWT (use only when discussing the wire format specifically), session, cookie, credential.
+**Authentication Evidence**:
+The immutable successful Result that identifies the validated Sign-in Method, authentication time, and method-specific verified values.
+Authentication Evidence never identifies an application user and never grants application authorization by itself.
+_Avoid_: User, application session, application Token
 
 **Result**:
-The value object returned by `send_code` and `verify_code` — carries `success?`, `error` (symbol), `token`, `channel`, and `phone`. Used in place of exceptions for expected failure modes (wrong code, rate-limited, invalid phone).
-_Avoid_: response, outcome, status.
+The value returned by a RubyAuth finish or validation operation.
+It contains either Authentication Evidence or a stable safe failure symbol and optional safe metadata.
+_Avoid_: Provider response, exception payload
 
-**OTP adapter**:
-The strategy that sends and verifies codes. `TwilioAdapter` (production) wraps Twilio Verify; `TestAdapter` (test mode) skips the network and accepts the magic code `"000000"`.
-_Avoid_: provider, backend, gateway.
+**Verified Email**:
+An email address whose control a trusted provider or Email Magic Link proved during authentication.
+RubyAuth trims surrounding whitespace and case-folds the address without removing dots, plus suffixes, or provider-specific aliases.
+_Avoid_: Unverified email, provider profile
 
-**Verify Service**:
-A Twilio-side configuration unit referenced by SID. One per host app at minimum; each carries Twilio-side rate limits, SMS templates, and per-channel settings. The gem references one configured via `twilio_verify_service_sid`.
-_Avoid_: service (too vague), verification service.
+**Email Magic Link**:
+A ten-minute encrypted credential sent to a Verified Email and validated by RubyAuth after a browser posts it from the URL fragment.
+RubyAuth returns a replay identifier, and the Host Application decides atomically whether that identifier can be used once.
+_Avoid_: Password reset link, reusable link
 
-**Test mode**:
-A configuration in which the OTP adapter is swapped to `TestAdapter`. Sends always succeed; `"000000"` always verifies. Intended for host-app test suites — never production.
-_Avoid_: stub mode, fake mode, mock mode.
+**Provider Subject**:
+The stable identifier that Apple or Google asserts for one provider identity.
+A provider can omit the Verified Email on later authentication while continuing to assert the same Provider Subject.
+_Avoid_: Email, application user ID
 
-**Signing key**:
-The HMAC-SHA256 secret used to sign and verify Tokens. Configured via `signing_key`. Must be a high-entropy random string (≥ 32 bytes recommended).
-_Avoid_: secret, key, JWT secret.
+**Passkey**:
+A discoverable WebAuthn credential that requires local user verification without disclosing a biometric to RubyAuth.
+The Host Application stores its public credential values and supplies them to RubyAuth for validation.
+_Avoid_: Password, biometric identity
 
-**Rate limiter**:
-The pre-send gate that limits `send_code` attempts per Phone per window. Independent of Twilio Verify's own per-service limits.
-_Avoid_: throttle, gate.
+**Ceremony Envelope**:
+A short-lived authenticated encrypted value that carries OAuth or Passkey challenge state through the browser.
+RubyAuth issues and validates the envelope without retaining server-side ceremony state.
+_Avoid_: Database session, persistent challenge
 
-**Engine**:
-The mountable Rails engine that drives the **Verification flow** end-to-end — it owns the routes and controller, manages the pending-**Phone** session state, and issues the **Token**. It produces an **Identity** and nothing more: it never touches a host app's user records, and it ships no views. Mounted in a single line; all meaning is delegated to the **Host app**.
-_Avoid_: app, plugin, mountable app, sign-in engine.
-
-**Verification flow**:
-The host-facing sequence the **Engine** drives: enter **Phone** → receive **OTP** → enter code → **Token** issued and stored in `session[]`. Comprises a send step and a verify step, each rendering a host-owned template. On success the **Host app** is redirected to its configured landing path; on an expected failure the same step re-renders with an error.
-_Avoid_: login flow, sign-in flow, auth flow, wizard.
+**Rails Engine**:
+The optional mountable Rails flow that owns authentication routes, validates external input, resets the browser session after successful authentication, and invokes explicit Host Application callbacks.
+It never decides which application user the Authentication Evidence represents.
+_Avoid_: User management engine, session store
 
 ## Example dialogue
 
-> **Dev:** When a phone is verified, do we mark the User active?
-> **Domain expert:** Wrong direction. This gem doesn't know what a User is. You just got back an Identity carrying the verified Phone. *Your* code decides what that means — for one host app it's `User.find_or_create_by(phone:)`; for another it's looking up an existing admin and rejecting unknown phones.
+**Developer**: Google returned an email and a subject.
+Which one is my User?
 
-> **Dev:** Can the Identity carry an email?
-> **Domain expert:** No — the gem only does Phone. If you also want email, that's a different verification flow; the Identity stays phone-only.
+**Domain expert**: Neither.
+RubyAuth returns Authentication Evidence with the Google Provider Subject and Verified Email, and your Host Application resolves them to its own user.
 
-> **Dev:** I want to test the sign-in form without hitting Twilio in CI.
-> **Domain expert:** Use Test mode. `Bitsmithy::Auth.test_mode!` swaps the OTP adapter — `send_code` succeeds and `verify_code` accepts `"000000"`. Don't ship that to production.
+**Developer**: Where does RubyAuth store used Email Magic Links?
+
+**Domain expert**: Nowhere.
+RubyAuth validates the encrypted credential and returns its replay identifier, and your Host Application claims that identifier atomically.
+
+**Developer**: Does RubyAuth save a Passkey public key?
+
+**Domain expert**: No.
+Your Host Application loads and stores Passkey values, while RubyAuth performs the WebAuthn ceremony and cryptographic validation.

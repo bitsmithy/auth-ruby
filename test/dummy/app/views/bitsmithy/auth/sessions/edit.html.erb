@@ -1,8 +1,0 @@
-<% if @error.present? %>
-  <div class="error"><%= @error %></div>
-<% end %>
-<%= form_tag("/auth/verify") do %>
-  <%= label_tag :code, "Verification code" %>
-  <%= text_field_tag :code %>
-  <%= submit_tag "Verify" %>
-<% end %>

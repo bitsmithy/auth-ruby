@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.authors = ["Howard Huang"]
   spec.email = ["hao@hwrd.me"]
 
-  spec.summary = "Phone-number OTP authentication for Ruby applications"
-  spec.description = "Verify users by sending one-time codes to their phone via SMS. " \
-                     "Wraps Twilio Verify, provides a Rails controller helper, and ships " \
-                     "a mountable engine for the default sign-in flow."
+  spec.summary = "Stateless passwordless authentication for Ruby applications"
+  spec.description = "Validate Apple, Google, Email Magic Link, and Passkey credentials. " \
+                     "Returns Authentication Evidence while host applications own identity, " \
+                     "persistence, sessions, and authorization."
   spec.homepage = "https://github.com/bitsmithy/auth-ruby"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 4.0.5"
@@ -37,8 +37,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "jwt", "~> 3.2"
-  spec.add_dependency "phonelib", "~> 0.10"
-  spec.add_dependency "twilio-ruby", "~> 7.0"
+  spec.add_dependency "webauthn", "~> 3.4"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://guides.rubygems.org/make-your-own-gem/

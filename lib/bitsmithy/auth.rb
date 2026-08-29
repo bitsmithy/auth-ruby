@@ -4,19 +4,23 @@ require_relative "auth/version"
 require_relative "auth/errors"
 require_relative "auth/config"
 require_relative "auth/result"
-require_relative "auth/token"
-require_relative "auth/phone"
-require_relative "auth/rate_limiter"
-require_relative "auth/stores/memory_store"
-require_relative "auth/otp/test_adapter"
+require_relative "auth/authentication_evidence"
+require_relative "auth/authorization_request"
+require_relative "auth/apple"
+require_relative "auth/email"
+require_relative "auth/envelope"
+require_relative "auth/magic_link"
+require_relative "auth/passkey"
+require_relative "auth/passkey_methods"
+require_relative "auth/google"
+require_relative "auth/testing"
 
-if defined?(ActionController)
-  require_relative "auth/controller"
-  require_relative "auth/engine" if defined?(Rails::Engine)
-end
+require_relative "auth/engine" if defined?(Rails::Engine)
 
 module Bitsmithy
   module Auth
+    extend PasskeyMethods
+
     class << self
       def config
         @config ||= Config.new
@@ -27,58 +31,36 @@ module Bitsmithy
         config
       end
 
-      def send_code(phone)
-        normalized = normalize_phone(phone)
-        rate_limiter.check!("send_code:#{normalized}")
-        config.otp_adapter.send_code(normalized)
-      rescue RateLimited
-        Result.failure(error: :rate_limited, phone: normalized)
-      rescue InvalidPhoneNumber
-        Result.failure(error: :invalid_phone_number, phone: phone)
+      def start_apple_authentication(redirect_uri:, return_to:)
+        Apple.start(redirect_uri: redirect_uri, return_to: return_to, config: config)
       end
 
-      def verify_code(phone, code)
-        normalized = normalize_phone(phone)
-        config.otp_adapter.verify_code(normalized, code)
-      rescue InvalidPhoneNumber
-        Result.failure(error: :invalid_phone_number, phone: phone)
+      def finish_apple_authentication(code:, state:, redirect_uri:)
+        Apple.finish(code: code, state: state, redirect_uri: redirect_uri, config: config)
       end
 
-      def decode_token(token)
-        Token.decode(token, config: config)
+      def start_google_authentication(redirect_uri:, return_to:)
+        Google.start(redirect_uri: redirect_uri, return_to: return_to, config: config)
       end
 
-      def normalize_phone(input, country: nil)
-        Phone.normalized(input, country: country)
+      def finish_google_authentication(code:, state:, redirect_uri:)
+        Google.finish(code: code, state: state, redirect_uri: redirect_uri, config: config)
       end
 
-      def redact_phone(phone)
-        Phone.redact(phone)
+      def normalize_email(input)
+        Email.normalize(input)
       end
 
-      def test_mode!
-        unless defined?(Rails) && (Rails.env.test? || Rails.env.development?)
-          raise ConfigurationError,
-                "#{self}.#{__method__} is only available in Rails test or development environments."
-        end
+      def request_email_magic_link(email:, redirect_uri:)
+        MagicLink.request(email: email, redirect_uri: redirect_uri, config: config)
+      end
 
-        config.signing_key ||= "test-signing-key-not-for-production"
-        config.otp_adapter = OTP::TestAdapter.new(config)
+      def verify_email_magic_link(credential)
+        MagicLink.verify(credential, config: config)
       end
 
       def reset_config!
         @config = nil
-        @rate_limiter = nil
-      end
-
-      private
-
-      def rate_limiter
-        @rate_limiter ||= RateLimiter.new(
-          store: config.rate_limit_store,
-          max_attempts: config.rate_limit[:per_phone],
-          window: config.rate_limit[:window]
-        )
       end
     end
   end

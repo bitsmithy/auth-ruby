@@ -18,6 +18,7 @@ gem "rubocop-rake", require: false
 gem "rubocop-rspec", require: false
 
 group :test do
+  gem "actionmailer", "~> 8.0"
   gem "actionpack", "~> 8.0"
   gem "cgi"
   gem "railties", "~> 8.0"

@@ -5,9 +5,9 @@ require_relative "../engine_helper"
 class LocaleSmokeTest < ActiveSupport::TestCase
   test "every engine-surfaced error symbol has a non-missing en translation" do
     error_symbols = %i[
-      invalid_phone_number
-      rate_limited
-      invalid_code
+      apple_unavailable expired_magic_link google_unavailable
+      invalid_apple_authentication invalid_email invalid_google_authentication
+      invalid_magic_link rate_limited used_magic_link
     ]
 
     error_symbols.each do |symbol|

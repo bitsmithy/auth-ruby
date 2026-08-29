@@ -2,6 +2,7 @@
 
 require "rails"
 require "action_controller/railtie"
+require "action_mailer/railtie"
 
 require "bitsmithy/auth"
 
@@ -12,6 +13,8 @@ module Dummy
     config.eager_load = false
     config.hosts.clear
     config.action_controller.allow_forgery_protection = false
+    config.action_mailer.delivery_method = :test
+    config.active_job.queue_adapter = :test
 
     config.cache_store = :memory_store
 

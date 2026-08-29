@@ -2,6 +2,12 @@
 en:
   bitsmithy_auth:
     errors:
-      invalid_code: "That code doesn't match. Please try again."
-      invalid_phone_number: "That phone number doesn't look valid."
+      apple_unavailable: "Apple is unavailable. Try another way to continue."
+      expired_magic_link: "This link expired. Request another secure link."
+      invalid_apple_authentication: "Apple could not verify this request. Try again."
+      invalid_email: "Enter a valid email address."
+      google_unavailable: "Google is unavailable. Try another way to continue."
+      invalid_google_authentication: "Google could not verify this request. Try again."
+      invalid_magic_link: "This link is not valid. Request another secure link."
       rate_limited: "Too many attempts. Please try again later."
+      used_magic_link: "This link was already used. Request another secure link."

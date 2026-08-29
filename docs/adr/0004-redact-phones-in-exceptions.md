@@ -1,3 +1,7 @@
+---
+status: superseded by ADR-0009
+---
+
 # Phone redaction is context-dependent
 
 Phone numbers in exception messages are redacted **when they represent a successfully-parsed Phone** (e.g. rate-limit failures, Twilio operation failures, any future exception that surfaces a Phone the gem already accepted as valid). The gem ships `Bitsmithy::Auth.redact_phone(phone)` as a public helper for Host apps to apply the same masking in their own log statements.

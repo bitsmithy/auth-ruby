@@ -1,9 +1,6 @@
-# The engine ships no views; the host owns 100% of rendering
+# The Rails Engine ships no branded views
 
-`Bitsmithy::Auth::Engine` ships zero view templates. Its controller renders named templates (the Phone-entry form and the code-entry form) that Rails resolves from the host app's view paths — the host MUST create them before a freshly mounted engine renders anything. This is a deliberate deviation from the Devise/Clearance norm of shipping default views with an eject generator.
+Authentication screens must match each Host Application's navigation, copy, visual system, accessibility behavior, and legal guidance.
 
-The trade-off: out-of-the-box rendering versus uncompromised customizability. Shipping default views would let `mount` render immediately, but auth screens are among the most app-specific UI a host has (branding, layout, copy, form structure), so shipped defaults would be replaced in nearly every real host app — carrying an opinionated UI, a styling system, and an eject generator that almost no one keeps. We chose to ship none: the host writes two templates against a documented contract (the locals and route helpers the controller exposes), and owns every pixel from the first render.
-
-Error wording is the one piece of presentation the gem does NOT push entirely onto the host: the controller looks up `I18n.t("bitsmithy_auth.errors.<symbol>")` for each failure Result symbol and exposes it to the re-rendered form, and the gem ships an `en` locale with sensible defaults for every error symbol. Hosts override wording by defining the same keys in their own locale files — no symbol→message mapping code, and full localizability, without the host owning the strings or the gem owning the layout.
-
-Consequences: the template names, the locals/route helpers passed to them, and the `bitsmithy_auth.errors.*` locale keys are a public contract host apps build against. "One `mount` line just works" is therefore qualified — routing and flow work immediately, but rendering requires the two host templates to exist first.
+The RubyAuth Rails Engine renders named Host Application templates and ships an install generator with accessible starter templates rather than treating those templates as the library's production interface.
+RubyAuth owns route and form contracts, safe failures, and authentication orchestration; the Host Application owns every rendered decision and can replace generated files immediately.

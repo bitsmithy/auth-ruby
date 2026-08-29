@@ -2,17 +2,17 @@
 
 module Bitsmithy
   module Auth
-    Result = Data.define(:success, :error, :token, :channel, :phone) do
+    Result = Data.define(:success, :error, :evidence, :metadata) do
       def success?
         success
       end
 
-      def self.success(token: nil, channel: :sms, phone: nil)
-        new(success: true, error: nil, token: token, channel: channel, phone: phone)
+      def self.success(evidence: nil, metadata: {})
+        new(success: true, error: nil, evidence: evidence, metadata: metadata.freeze)
       end
 
-      def self.failure(error:, channel: :sms, phone: nil)
-        new(success: false, error: error, phone: phone, channel: channel, token: nil)
+      def self.failure(error:, metadata: {})
+        new(success: false, error: error, evidence: nil, metadata: metadata.freeze)
       end
     end
   end
